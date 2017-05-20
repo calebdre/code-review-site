@@ -1,0 +1,73 @@
+::-moz-selection { background: yellow; }
+::selection { background: yellow; }
+
+body, html{
+    margin:0;
+    padding:0;
+}
+body {
+    font-size:14px;
+}
+
+pre code, pre {
+    white-space: pre-wrap;
+}
+
+pre, code{
+    margin:0;
+}
+
+.container {
+    width:400px;
+    margin: 10px auto;
+}
+
+.block {
+    display:flex;
+}
+
+.hljs {
+    padding:0;
+}
+
+.hljs > div {
+    padding:3px 10px;
+    user-select: none;
+}
+
+.hljs > div:hover {
+    background-color: #cecece;
+    cursor: pointer;
+}
+
+.hljs div.active {
+    background-color: #bfbfbf;
+}
+
+.linenums{
+    padding-right: 8px;
+    background-color: #F0F0F0;
+    border-right:1px solid #ddd;
+}
+
+.linenums div {
+    padding: 3px 0;
+    display: block;
+}
+
+.inline-block {
+    display: inline-block;
+}
+.linenums .active {
+    height:130px;
+}
+
+.comment-editor {
+    height:100px;
+    display: block;
+}
+
+.submit-container {
+    border:1px solid #eee;
+    padding:10px;
+}
