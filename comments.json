@@ -1,0 +1,19 @@
+{
+  "reviews": [
+    {
+      "user": "bob",
+      "comments": [
+        {
+          "comment": "This could definitely be abstracted to a *better* place",
+          "upvotes": 7,
+          "line": 6
+        },
+        {
+          "comment": "This could definitely be abstracted to a *better* place",
+          "upvotes": 2,
+          "line": 9
+        }
+      ]
+    }
+  ]
+}

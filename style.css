@@ -17,11 +17,6 @@ pre, code{
     margin:0;
 }
 
-.container {
-    width:400px;
-    margin: 10px auto;
-}
-
 .block {
     display:flex;
 }
@@ -44,14 +39,51 @@ pre, code{
     background-color: #bfbfbf;
 }
 
+.container {
+    display: flex;
+}
+
+.container .code {
+    flex: 2;
+    display: flex;
+    padding: 16px 24px;
+    background: #F0F0F0;
+}
+
+.container .code .codecode {
+    flex: 1;
+}
+
+.container .action-bar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #444;
+    color: #fff;
+    padding: 16px 24px;
+    text-align: left;
+}
+
+.action-bar .comment .editor-toolbar {
+    background-color: #fff;
+    opacity: 1;
+}
+
+.action-bar .comment .CodeMirror {
+    height: 200px;
+    min-height: initial;
+}
+
+.action-bar .comment .editor-statusbar {
+    color:#fff;
+}
 .linenums{
-    padding-right: 8px;
     background-color: #F0F0F0;
     border-right:1px solid #ddd;
 }
 
 .linenums div {
-    padding: 3px 0;
+    padding: 3px;
     display: block;
 }
 
@@ -67,7 +99,6 @@ pre, code{
     display: block;
 }
 
-.submit-container {
-    border:1px solid #eee;
-    padding:10px;
+.linenums div.highlight {
+    background-color: red;
 }
