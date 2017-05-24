@@ -7,6 +7,7 @@ body, html{
 }
 body {
     font-size:14px;
+    font-family: 'Open Sans', sans-serif;
 }
 
 pre code, pre {
@@ -15,6 +16,39 @@ pre code, pre {
 
 pre, code{
     margin:0;
+}
+
+.button {
+    background-color: transparent; /* Green */
+    border: 1px solid #fff;
+    color: white;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: .3s all ease-in-out;
+    border-radius:3px;
+    outline:none;
+}
+
+.button:hover {
+    background-color: #fefefe;
+    color:#222;
+}
+
+.user-comment .time-since {
+    margin:0;
+    font-size:12px;
+}
+
+.user-comment .username {
+    margin-bottom:4px;
+    margin-top:0;
+}
+
+.color-muted {
+    color:#888;
 }
 
 .block {
@@ -43,6 +77,18 @@ pre, code{
     display: flex;
 }
 
+.action-bar .comment {
+    margin-top:16px;
+}
+
+.comment .submit{
+    margin-left: 8px;
+}
+
+.comment .buttons {
+    margin-top: 16px;
+}
+
 .container .code {
     flex: 2;
     display: flex;
@@ -56,12 +102,46 @@ pre, code{
 
 .container .action-bar {
     flex: 1;
-    display: flex;
-    flex-direction: column;
+    /*https://scotch.io/tutorials/a-visual-guide-to-css3-flexbox-properties*/
     background-color: #444;
     color: #fff;
-    padding: 16px 24px;
+    padding: 16px 0;
     text-align: left;
+}
+
+.action-bar .other-comments {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.other-comments .user-comment{
+    background-color: #555;
+    padding: 8px 16px;
+}
+
+.other-comments .comment-separator {
+    border: 0;
+    background-color: #888;
+    height: 1px;
+    margin: 0;
+}
+
+.action-bar .section-separator {
+    border: 0;
+    background-color: #777;
+    height: 1px;
+    margin: 0;
+}
+.action-bar > * {
+    margin-left: 24px;
+    margin-right: 24px;
+}
+
+.action-bar .section-title{
+    color:#888;
+    text-transform: capitalize;
+    margin-bottom: 5px;
+    font-family: 'Raleway', sans-serif;
 }
 
 .action-bar .comment .editor-toolbar {

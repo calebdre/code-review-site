@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Code Review Site</title>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Raleway:500" rel="stylesheet">
         <link rel="stylesheet" href="default.min.css">
         <link rel="stylesheet" href="simplemde.min.css">
         <link rel="stylesheet" href="style.css">
@@ -30,10 +31,32 @@ document
 .getElementById('root')
 );</code></pre>
             </div>
+            <!-- inspiration: https://dribbble.com/shots/2739532-Code-Review/attachments/556005-->
             <div class="action-bar">
+                <p class="section-title">other comments</p>
+                <hr class="section-separator" />
+                <div class="other-comments">
+                    <div class="user-comment">
+                        <p class="username">myusernam123</p>
+                        <p class="time-since color-muted">7 hours ago</p>
+                        <div class="comment-wrapper">
+                            <h1 id="whatsup">what's up?</h1>
+                            <p><code>nothing much</code></p>
+                        </div>
+                    </div>
+                    <hr class="comment-separator" />
+                </div>
+
+                <p class="section-title">comment</p>
+                <hr class="section-separator" />
                 <div class="comment">
                     <div>
+                        <p class="lines-selected"></p>
                         <textarea id="commentbox" cols="30" rows="10"></textarea>
+                    </div>
+                    <div class="buttons">
+                        <button class="button preview">Preview</button>
+                        <button class="button submit">Submit</button>
                     </div>
                 </div>
                 <p class="instructions">This bar will be where you will be able to take actions on code you select.</p>

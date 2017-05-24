@@ -67,10 +67,14 @@ function onLineClick(e) {
 
     $target.toggleClass("active");
     if ($target.hasClass("active")) {
-        calculateEditorPosition(lastEditorPosition);
-    } else if (!$target.hasClass("active") && $target.index() === lastEditorPosition) {
-        detachEditor(lastEditorPosition);
-        calculateEditorPosition($target.index());
+        lineNumberCounter.increment();
+        // calculateEditorPosition(lastEditorPosition);
+    } else if (!$target.hasClass("active")) {
+        lineNumberCounter.decrement();
+        // if ($target.index() === lastEditorPosition) {
+        //     detachEditor(lastEditorPosition);
+        //     calculateEditorPosition($target.index());
+        // }
     }
 }
 
@@ -112,9 +116,17 @@ function attachListeners() {
         window.isMouseDown = true;
     });
 
+    previewButton.applyListener();
+
     $("#code > div").mouseenter((e) => {
         if (window.isMouseDown === true) {
-            $(e.currentTarget).toggleClass("active");
+            const $el = $(e.currentTarget);
+            $el.toggleClass("active");
+            if ($el.hasClass("active")) {
+                lineNumberCounter.increment();
+            } else {
+                lineNumberCounter.decrement();
+            }
         }
     });
 }
@@ -132,13 +144,64 @@ function applyReview(item) {
     }));
 }
 
+class LineNumberCounter {
+    constructor() {
+        this._count = 0;
+        this._$counterEl = $(".lines-selected");
+    }
+
+    increment() {
+        this._count++;
+        this._refreshText();
+    }
+
+    decrement() {
+        this._count--;
+        this._refreshText();
+    }
+
+    _refreshText() {
+        this._$counterEl.text(this._count + " lines selected.");
+    }
+}
+
+class PreviewButtonState {
+    constructor() {
+        this._isPreviewActive = false;
+        this._el = $(".comment .buttons .preview");
+    }
+
+    togglePreview() {
+        this._isPreviewActive = !this._isPreviewActive;
+        commentEditor.togglePreview();
+
+        if (this._isPreviewActive) {
+            this._el.text("Edit");
+        } else {
+            this._el.text("Preview");
+        }
+    }
+
+    applyListener() {
+        this._el.click(this.togglePreview.bind(this));
+    }
+}
+
+
+
+let commentEditor = new SimpleMDE({
+    element: $("#commentbox").get(0),
+    toolbar: false,
+    status: false
+});
+const previewButton = new PreviewButtonState();
+const lineNumberCounter = new LineNumberCounter();
+
 $('document').ready(() => {
     generateLineNumbers();
     transformCodeHtml();
     attachListeners();
-    let e = new SimpleMDE({
-        element: $("#commentbox").get(0)
-    });
+
     const reviews = fetchReviews();
     reviews.then((r) => {
         r['reviews'].forEach((item) => {
