@@ -60,7 +60,8 @@ pre, code{
 }
 
 .hljs > div {
-    padding:3px 10px;
+    padding-top:4px;
+    padding-bottom:4px;
     user-select: none;
 }
 
@@ -69,8 +70,30 @@ pre, code{
     cursor: pointer;
 }
 
-.hljs div.active {
+.hljs div.active, .hljs div.highlight {
     background-color: #bfbfbf;
+}
+
+.linenums {
+    background-color: #F0F0F0;
+    border-right:1px solid #ddd;
+}
+
+.linenums div {
+    padding-top: 4.3px;
+    padding-bottom: 4.3px;
+    display: block;
+    text-align: center;
+}
+
+.linenums div:hover {
+    background-color: #d7d7d7;
+    cursor: pointer;
+}
+
+.hljs > div, .linenums div {
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .container {
@@ -109,17 +132,17 @@ pre, code{
     text-align: left;
 }
 
-.action-bar .other-comments {
+.action-bar .all-comments {
     margin-left: 0;
     margin-right: 0;
 }
 
-.other-comments .user-comment{
+.all-comments .user-comment{
     background-color: #555;
     padding: 8px 16px;
 }
 
-.other-comments .comment-separator {
+.all-comments .comment-separator {
     border: 0;
     background-color: #888;
     height: 1px;
@@ -157,28 +180,12 @@ pre, code{
 .action-bar .comment .editor-statusbar {
     color:#fff;
 }
-.linenums{
-    background-color: #F0F0F0;
-    border-right:1px solid #ddd;
-}
-
-.linenums div {
-    padding: 3px;
-    display: block;
-}
 
 .inline-block {
     display: inline-block;
-}
-.linenums .active {
-    height:130px;
 }
 
 .comment-editor {
     height:100px;
     display: block;
-}
-
-.linenums div.highlight {
-    background-color: red;
 }

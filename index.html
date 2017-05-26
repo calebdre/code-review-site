@@ -35,7 +35,7 @@ document
             <div class="action-bar">
                 <p class="section-title">other comments</p>
                 <hr class="section-separator" />
-                <div class="other-comments">
+                <div class="all-comments">
                     <div class="user-comment">
                         <p class="username">myusernam123</p>
                         <p class="time-since color-muted">7 hours ago</p>
@@ -52,16 +52,17 @@ document
                 <div class="comment">
                     <div>
                         <p class="lines-selected"></p>
-                        <textarea id="commentbox" cols="30" rows="10"></textarea>
+                        <textarea id="commentbox"></textarea>
                     </div>
                     <div class="buttons">
                         <button class="button preview">Preview</button>
-                        <button class="button submit">Submit</button>
+                        <button id="submit-comment-button" class="button submit">Submit</button>
                     </div>
                 </div>
                 <p class="instructions">This bar will be where you will be able to take actions on code you select.</p>
             </div>
         </div>
+        <script src="showdown.min.js"></script>
         <script src="highlight.min.js"></script>
         <script src="jquery-3.2.1.slim.min.js"></script>
         <script src="simplemde.min.js"></script>
