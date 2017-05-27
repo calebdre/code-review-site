@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <a id="login-button" href="">Login with github</a>
+
+    <script src="firebase4.0.js"></script>
+    <script src="jquery-3.2.1.slim.min.js"></script>
+    <!--<script src="firebase-database.js"></script>-->
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyCeeGGImxoRGjokqulhtW791YpsreZpA8o",
+            authDomain: "d2l-scraper.firebaseapp.com",
+            databaseURL: "https://d2l-scraper.firebaseio.com",
+            projectId: "d2l-scraper",
+            storageBucket: "d2l-scraper.appspot.com",
+            messagingSenderId: "610068683551"
+        };
+        firebase.initializeApp(config);
+
+        class GithubLoginButton {
+            /**
+             *
+             * @param LoginService loginService
+             */
+            constructor(loginService) {
+                this.$button = $("#login-button");
+                this.loginService = loginService;
+            }
+
+            applyListeners() {
+                this.$button.attr("href", this.loginService.generateGithubAuthLink());
+                this.$button.click((e) => {
+                    e.preventDefault();
+
+                    loginService.recordLoginAttempt().then(() => {
+                        window.location = this.$button.attr("href");
+                    });
+                });
+            }
+        }
+
+        class LoginService {
+            constructor() {
+                this._githubState = "";
+            }
+
+            generateGithubAuthLink() {
+                const clientId = "d6c63e9c626024140ba6";
+                const scope = "user:email user";
+                const state = generateUUID();
+                const redirectUri = "https://us-central1-d2l-scraper.cloudfunctions.net/registerGithub";
+
+                const authLink = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`
+
+                this._githubState = state;
+                return authLink;
+            }
+
+            recordLoginAttempt() {
+                return new Promise((resolve, reject) => {
+                    const database = firebase.database();
+                    let attemptData = {}
+                    attemptData[this._githubState] = "not completed"
+                    database.ref("github-login-attempts")
+                        .set(attemptData)
+                        .then(ignored => {
+                            resolve();
+                        });
+                });
+            }
+        }
+
+        function generateUUID () { // Public Domain/MIT
+            var d = Date.now();
+            if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
+                d += performance.now(); //use high-precision timer if available
+            }
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = (d + Math.random() * 16) % 16 | 0;
+                d = Math.floor(d / 16);
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+        }
+
+        var loginService = new LoginService();
+        new GithubLoginButton(loginService).applyListeners();
+    </script>
+</body>
+</html>
