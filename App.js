@@ -43,6 +43,10 @@ function transformCodeHtml() {
     $code.html(mapped);
 }
 
+function getURLParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+}
+
 function attachListeners() {
     $('#code > div > div').click(onLineClick);
     $("body").mouseup((e) => {
@@ -237,6 +241,70 @@ class PreviewButtonState {
     }
 }
 
+class ReviewsRepository {
+    constructor() {
+        this.database = firebase.database();
+    }
+}
+
+class UserRepository {
+    constructor() {
+        this.database = firebase.database();
+    }
+
+    _user(props) {
+        return [
+            "avatar_url",
+            "email",
+            "name",
+            "login",
+            "url"
+        ].reduce((accumulator, iteration) => {
+            if(props.hasOwnProperty(iteration)) {
+                accumulator[iteration] = props[iteration];
+            }
+            return accumulator;
+        }, {});
+    }
+
+    async getOrCreateGithubUser(accessToken) {
+        return await new Promise((resolve, reject) => {
+            if (localStorage.getItem("current_user") !== null) {
+                resolve(JSON.parse(localStorage.getItem("current_user")));
+            }
+            this.database.ref("users")
+                .child(accessToken)
+                .once("value", async (snapshot) => {
+                    if (snapshot.val() === null) {
+                        resolve(await this.createUser(accessToken));
+                    } else {
+                        resolve(snapshot.val());
+                    }
+                })
+        })
+    }
+
+    async createUser(accessToken) {
+        let headers = new Headers();
+        headers.append("Accept", "application/vnd.github.v3+json");
+        headers.append("Authorization", "token " + accessToken);
+        const  data = await fetch("https://api.github.com/user", {
+            headers: headers,
+            method: "GET"
+        }).then(response => response.json())
+
+        const user = this._user(data);
+        await this.database.ref(`users/${accessToken}`).set(user);
+        localStorage.setItem("current_user", JSON.stringify(user));
+        localStorage.setItem("access_token", accessToken);
+        return user;
+    }
+
+    getCurrentUser() {
+        return localStorage.getItem("current_user");
+    }
+}
+
 const commentList = new CommentList();
 const commentEditor = new CommentEditor();
 const previewButton = new PreviewButtonState();
@@ -247,6 +315,15 @@ $('document').ready(() => {
     generateLineNumbers();
     transformCodeHtml();
     attachListeners();
+
+
+    if (getURLParameter("access_token") !== null) {
+        const repo = new UserRepository();
+        const r = repo.getOrCreateGithubUser(getURLParameter("access_token"));
+        r.then(e => {
+            console.log(e);
+        });
+    }
 
     const reviews = fetchReviews();
     reviews.then((r) => {

@@ -62,11 +62,24 @@ document
                 <p class="instructions">This bar will be where you will be able to take actions on code you select.</p>
             </div>
         </div>
+        <script src="firebase4.0.js"></script>
         <script src="showdown.min.js"></script>
         <script src="highlight.min.js"></script>
         <script src="jquery-3.2.1.slim.min.js"></script>
         <script src="simplemde.min.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script>
+        <script>
+            hljs.initHighlightingOnLoad();
+            // Initialize Firebase
+            var config = {
+                apiKey: "AIzaSyCeeGGImxoRGjokqulhtW791YpsreZpA8o",
+                authDomain: "d2l-scraper.firebaseapp.com",
+                databaseURL: "https://d2l-scraper.firebaseio.com",
+                projectId: "d2l-scraper",
+                storageBucket: "d2l-scraper.appspot.com",
+                messagingSenderId: "610068683551"
+            };
+            firebase.initializeApp(config);
+        </script>
         <script src="App.js"></script>
     </body>
 </html>
