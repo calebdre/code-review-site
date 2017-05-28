@@ -79,28 +79,6 @@ function applyReview(item) {
     }));
 }
 
-function composeHtml(data) {
-    const dataItem = Array.isArray(data) ? data[0] : data;
-
-    dataItem["tag"] = `<${dataItem["tag"]}>`;
-    const $el = $(dataItem["tag"]).addClass(dataItem["class"]);
-    if (dataItem.hasOwnProperty("data")) {
-        $el.html(dataItem["data"]);
-    }
-    if (dataItem.hasOwnProperty("children")) {
-        for (let i = 0; i < dataItem["children"].length; i++) {
-            $el.append(composeHtml(dataItem["children"][i]));
-        }
-    }
-
-    if (data.length > 1) {
-        const composedSibling = composeHtml(data.slice(1));
-        return $el.add(composedSibling);
-    }
-
-    return $el;
-}
-
 class CommentList {
     constructor() {
         this._$commentsContainer = $(".all-comments");

@@ -1,0 +1,67 @@
+::-moz-selection { background: yellow; }
+::selection { background: yellow; }
+
+body, html{
+    margin:0;
+    padding:0;
+}
+body {
+    font-size:14px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+pre code, pre {
+    white-space: pre-wrap;
+}
+
+pre, code{
+    margin:0;
+}
+
+.button {
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: .3s all ease-in-out;
+    border-radius:3px;
+    outline:none;
+    background-color: transparent;
+}
+
+.button.button-small {
+    padding: 4px 8px;
+    font-size:12px;
+    text-transform: capitalize;
+}
+
+.button-dark {
+    border: 1px solid #666;
+    color: #666;
+}
+.button-dark:hover {
+    background-color: #666;
+    color:#fff;
+}
+
+.button-light {
+    border: 1px solid #fff;
+    color: white;
+}
+
+.button-light:hover {
+    background-color: #fefefe;
+    color:#222;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        -webkit-transform: translateY(0);
+        transform: translateY(0); }
+    40% {
+        -webkit-transform: translateY(-16px);
+        transform: translateY(-16px); }
+    60% {
+        -webkit-transform: translateY(-7px);
+        transform: translateY(-7px); } }

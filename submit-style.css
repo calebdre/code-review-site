@@ -1,0 +1,115 @@
+.CodeMirror .CodeMirror-placeholder {
+    color: #757582;
+}
+
+.CodeMirror .file-type {
+    position:absolute;
+    bottom:10px;
+    left:40px;
+    font-weight: 400;
+    color: #ccc;
+    text-transform: lowercase;
+}
+
+.submission-container {
+    width:70%;
+    margin:24px auto;
+}
+
+.submission-container .input {
+    display: block;
+    padding:4px 6px;
+    border-radius: 4px;
+    outline: 0;
+    min-width:200px;
+    min-height:25px;
+    border:1px solid #ddd;
+}
+
+.submission-container .input:focus {
+    border:1px solid #aaa;
+}
+
+.submission-container .filename-input {
+    margin: 16px 0;
+    border:0;
+    border-bottom:1px solid #eee;
+    font-size:18px;
+    font-weight: 300;
+}
+
+.submission-container .filename-input:focus {
+    border:0;
+    border-bottom:1px solid #aaa;
+}
+
+.submission-container .context-input {
+    min-width: 370px;
+}
+
+.file-list {
+    margin:16px 0 0;
+    padding:0;
+    float: left;
+    width: 100%;
+}
+
+.file-list .file {
+    margin-right: 8px;
+    background: #E2E1DF;
+    padding: 3px 20px 3px 10px;
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+    float: left;
+    display: inline-block;
+    white-space: nowrap;
+    transition: background .3s;
+}
+
+.file-list .file .close {
+    font-size: 1.1rem;
+    position: absolute;
+    top: 7px;
+    right: 3px;
+    text-decoration: none;
+    line-height: 0.5;
+    color: #ccc;
+    color: rgba(0, 0, 0, 0.2);
+    padding: 0 0 4px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.file-list .file:hover, .file-list .file.active {
+    background: #ccc;
+}
+
+.file-list .file.bounce {
+    animation: bounce 1.2s 1;
+    background-color: #ccc;
+}
+
+.file-list  .file .close:hover {
+    color: #990033;
+}
+
+.input-group .input{
+    display: inline-block;
+}
+
+.input-group .button {
+    display: inline-block;
+    margin-left: 16px;
+}
+
+.input-tags {
+    position: relative;
+    margin-top: 16px;
+    overflow: auto;
+}
+
+.submission-container .submit-button {
+    margin-top:16px;
+}

@@ -9,7 +9,7 @@
 
     <script src="firebase4.0.js"></script>
     <script src="jquery-3.2.1.slim.min.js"></script>
-    <!--<script src="firebase-database.js"></script>-->
+    <script src="Utils.js"></script>
     <script>
         // Initialize Firebase
         var config = {
@@ -24,7 +24,6 @@
 
         class GithubLoginButton {
             /**
-             *
              * @param LoginService loginService
              */
             constructor(loginService) {
@@ -73,18 +72,6 @@
                         });
                 });
             }
-        }
-
-        function generateUUID () { // Public Domain/MIT
-            var d = Date.now();
-            if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
-                d += performance.now(); //use high-precision timer if available
-            }
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                var r = (d + Math.random() * 16) % 16 | 0;
-                d = Math.floor(d / 16);
-                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-            });
         }
 
         var loginService = new LoginService();

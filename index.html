@@ -10,7 +10,7 @@
     </head>
     <body>
 
-        <div class="container">
+        <div class="editor-container">
             <div class="code">
                 <pre class="linenums"></pre>
                 <pre class="codecode"><code id="code">var thecode = "update(e){\n" +
@@ -55,8 +55,8 @@ document
                         <textarea id="commentbox"></textarea>
                     </div>
                     <div class="buttons">
-                        <button class="button preview">Preview</button>
-                        <button id="submit-comment-button" class="button submit">Submit</button>
+                        <button class="button-light button preview">Preview</button>
+                        <button id="submit-comment-button" class="button-light button submit">Submit</button>
                     </div>
                 </div>
                 <p class="instructions">This bar will be where you will be able to take actions on code you select.</p>
@@ -67,6 +67,7 @@ document
         <script src="highlight.min.js"></script>
         <script src="jquery-3.2.1.slim.min.js"></script>
         <script src="simplemde.min.js"></script>
+        <script src="Utils.js"></script>
         <script>
             hljs.initHighlightingOnLoad();
             // Initialize Firebase
