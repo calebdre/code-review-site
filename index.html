@@ -3,26 +3,21 @@
     <head>
         <meta charset="UTF-8">
         <title>Code Review Website - Home</title>
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Raleway:500" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500|Raleway:500" rel="stylesheet">
         <link rel="stylesheet" href="default.min.css">
         <link rel="stylesheet" href="taggle.css">
         <link rel="stylesheet" href="shared.css">
         <link rel="stylesheet" href="index-style.css">
     </head>
     <body>
-
         <div class="container">
-
             <div class="title-filter-bar">
                 <p class="title">Review Requests</p>
                 <div id="filter-tags" class="filter-tags"></div>
             </div>
 
-            <p class="filter-by-text"></p>
-            <div class="submissions">
-
-
-            </div>
+            <p class="filter-by-text hidden"></p>
+            <div class="submissions"></div>
         </div>
 
         <script src="firebase4.0.js"></script>
@@ -30,10 +25,65 @@
         <script src="highlight.min.js"></script>
         <script src="jquery-3.2.1.slim.min.js"></script>
         <script src="taggle.min.js"></script>
+        <script src="moment.js"></script>
         <script>
+            class SubmissionList {
+                constructor() {
+                    this._submissions = [];
+                    this._submissionsHtml = $(".submissions");
+                }
+
+                append(submissionData) {
+                    const title = submissionData["context"];
+                    const userLogin = submissionData["user"]["login"];
+                    const avatar = submissionData["user"]["avatar_url"];
+                    const postedTime = moment(submissionData["posted_time"]).fromNow();
+                    const submissionUrl = "/submission.html?key=" + submissionData["key"];
+                    const numOfReviews = submissionData["num_of_reviews"] === undefined ? 0 : submissionData["num_of_reviews"];
+
+                    const submissionHtmlData = {
+                        "class": "submission", "tag": "div", "children": [
+                            {"class" : "title", "tag": "a", "data": title, "attrs": [{"name": "href", "value": submissionUrl}]},
+                            {"class": "tags", "tag": "ul", "children":
+                                submissionData["tags"].split(",")
+                                    .map(item => {
+                                        return {"class": "tag", "tag": "li", "data": item}
+                                    })
+                            },
+                            {"class": "meta-info", "tag": "div", "children": [
+                                {"class": "reviews-count-container", "tag": "div", "children": [
+                                    {"class": "reviews-text", "tag" : "p", "data": "Reviews"},
+                                    {"class": "reviews-count", "tag" : "p", "data": numOfReviews}
+                                ]},
+                                {"class": "user-info", "tag": "div", "children": [
+                                    {"class": "user-image", "tag":"img", "attrs": [{"name": "src", "value": avatar}]},
+                                    {"class": "username", "tag": "p", "children": [
+                                        {"tag": "a", "attrs": [{"name": "href", "value": "https://github.com/" + userLogin}], "data": userLogin}
+                                    ]},
+                                    {"class": "post-time", "tag": "p", "data": "posted " + postedTime}
+                                ]},
+                            ]}
+                        ]
+                    }
+
+                    const $html = composeHtml(submissionHtmlData);
+                    $html.find(".tag").click(e => {
+                        filterTags.add($(e.currentTarget).text());
+                    })
+                    this._submissionsHtml.append($html);
+                    this._submissions.push(submissionData);
+                }
+            }
 
             function updateFilter() {
                 const tags = filterTags.getTagValues()
+                const $filterText = $(".filter-by-text");
+                if (tags.length === 0) {
+                    $filterText.text("");
+                    $filterText.addClass("hidden");
+                    return;
+                }
+
                 const tagsHtmlData = tags.reduce((accumulator, item, index) => {
                     accumulator.push({
                         "class": "filter-tag",
@@ -51,9 +101,11 @@
 
                     return accumulator;
                 }, []);
+
                 const tagStringHtml = composeHtml(tagsHtmlData);
-                $(".filter-by-text").text('filtering by ');
-                $(".filter-by-text").append(tagStringHtml);
+                $filterText.text('Filtering by ');
+                $filterText.append(tagStringHtml);
+                $filterText.removeClass("hidden");
             }
 
             const filterTags = new Taggle("filter-tags", {
@@ -62,6 +114,23 @@
                 onTagAdd: updateFilter,
                 onTagRemove: updateFilter
             });
+
+            if (getURLParameter("access_token") !== null) {
+                const repo = new UserRepository();
+                const r = repo.getOrCreateGithubUser(getURLParameter("access_token"));
+                r.then(e => {
+                    console.log(e);
+                });
+            }
+
+            const submissionRepo = new SubmissionsRepository();
+            submissionRepo.all()
+                .then(subs => {
+                    let list = new SubmissionList();
+                    subs.forEach(sub => {
+                        list.append(sub);
+                    });
+                });
         </script>
     </body>
 </html>

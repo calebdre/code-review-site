@@ -9,6 +9,10 @@ var config = {
 };
 firebase.initializeApp(config);
 
+function getURLParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+}
+
 /**
  * @param Object data
  * @returns $
@@ -17,10 +21,22 @@ function composeHtml(data) {
     const dataItem = Array.isArray(data) ? data[0] : data;
 
     dataItem["tag"] = `<${dataItem["tag"]}>`;
-    const $el = $(dataItem["tag"]).addClass(dataItem["class"]);
+    const $el = $(dataItem["tag"]);
+
+    if (dataItem.hasOwnProperty("class")) {
+        $el.addClass(dataItem["class"]);
+    }
+
     if (dataItem.hasOwnProperty("data")) {
         $el.html(dataItem["data"]);
     }
+
+    if (dataItem.hasOwnProperty("attrs")) {
+        dataItem["attrs"].forEach(attr => {
+           $el.attr(attr["name"], attr["value"]);
+        });
+    }
+
     if (dataItem.hasOwnProperty("children")) {
         for (let i = 0; i < dataItem["children"].length; i++) {
             $el.append(composeHtml(dataItem["children"][i]));
@@ -75,6 +91,23 @@ class LoginService {
                     resolve();
                 });
         });
+    }
+}
+
+class SubmissionsRepository {
+    constructor() {
+        this.database = firebase.database();
+    }
+
+    async all() {
+        const t = await this.database.ref("/submissions").once("value");
+        const subs = t.val();
+        return Object.keys(subs).reduce((accumulator, item) => {
+            let newItem = subs[item];
+            newItem["key"] =  item;
+            accumulator.push(newItem);
+            return accumulator;
+        }, []);
     }
 }
 

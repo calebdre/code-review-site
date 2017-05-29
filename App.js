@@ -43,10 +43,6 @@ function transformCodeHtml() {
     $code.html(mapped);
 }
 
-function getURLParameter(name) {
-    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
-}
-
 function attachListeners() {
     $('#code > div > div').click(onLineClick);
     $("body").mouseup((e) => {
@@ -235,15 +231,6 @@ $('document').ready(() => {
     generateLineNumbers();
     transformCodeHtml();
     attachListeners();
-
-
-    if (getURLParameter("access_token") !== null) {
-        const repo = new UserRepository();
-        const r = repo.getOrCreateGithubUser(getURLParameter("access_token"));
-        r.then(e => {
-            console.log(e);
-        });
-    }
 
     const reviews = fetchReviews();
     reviews.then((r) => {

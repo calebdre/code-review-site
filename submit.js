@@ -17,8 +17,9 @@ class SubmitButton {
                 "user_token": token,
                 "user": user,
                 "files": files,
-                "tags": tags.getTagValues(),
-                "context": $("#input-context").val()
+                "tags": tags.getTagValues().join(","),
+                "context": $("#input-context").val(),
+                "posted_time": Date.now()
             }
 
             const database = firebase.database();

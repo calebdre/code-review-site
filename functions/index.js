@@ -40,13 +40,10 @@ exports.registerGithub = functions.https.onRequest((req, res) => {
             console.log("ended - here's the data: " + data);
             var responseData = JSON.parse(data);
             const database = admin.database();
-            database.ref("/user_tokens")
-                .push(responseData.access_token, (ignored) => {
-                    database.ref("/github-login-attempts/" + req.query.state)
-                        .remove()
-                        .then(ignored => {
-                            res.redirect(303, "http://localhost:8080?login_code=" + req.query.state + "&access_token=" + responseData.access_token);
-                        });
+            database.ref("/github-login-attempts/" + req.query.state)
+                .remove()
+                .then(ignored => {
+                    res.redirect(303, "http://localhost:8080?login_code=" + req.query.state + "&access_token=" + responseData.access_token);
                 });
         });
     });

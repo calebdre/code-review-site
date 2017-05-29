@@ -18,6 +18,15 @@ pre, code{
     margin:0;
 }
 
+a {
+    text-decoration: none;
+    color: #04a3f5;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
 .button {
     padding: 8px 16px;
     text-align: center;
