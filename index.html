@@ -2,75 +2,66 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Code Review Site</title>
+        <title>Code Review Website - Home</title>
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Raleway:500" rel="stylesheet">
         <link rel="stylesheet" href="default.min.css">
-        <link rel="stylesheet" href="simplemde.min.css">
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="taggle.css">
+        <link rel="stylesheet" href="shared.css">
+        <link rel="stylesheet" href="index-style.css">
     </head>
     <body>
 
-        <div class="editor-container">
-            <div class="code">
-                <pre class="linenums"></pre>
-                <pre class="codecode"><code id="code">var thecode = "update(e){\n" +
-"     console.log('cool');" +
-"     console.log('cool');" +
-"     console.log('cool');" +
-"     console.log('cool');" +
-"     console.log('cool');" +
-"     console.log('cool');" +
-"     console.log('cool');" +
-"};"
-ReactDOM.render(
-(CodeViewComponent code={thecode}>
+        <div class="container">
 
-/CodeViewComponent>
-),
-document
-.getElementById('root')
-);</code></pre>
+            <div class="title-filter-bar">
+                <p class="title">Review Requests</p>
+                <div id="filter-tags" class="filter-tags"></div>
             </div>
-            <!-- inspiration: https://dribbble.com/shots/2739532-Code-Review/attachments/556005-->
-            <div class="action-bar">
-                <p class="section-title">other comments</p>
-                <hr class="section-separator" />
-                <div class="all-comments">
-                    <div class="user-comment">
-                        <p class="username">myusernam123</p>
-                        <p class="time-since color-muted">7 hours ago</p>
-                        <div class="comment-wrapper">
-                            <h1 id="whatsup">what's up?</h1>
-                            <p><code>nothing much</code></p>
-                        </div>
-                    </div>
-                    <hr class="comment-separator" />
-                </div>
 
-                <p class="section-title">comment</p>
-                <hr class="section-separator" />
-                <div class="comment">
-                    <div>
-                        <p class="lines-selected"></p>
-                        <textarea id="commentbox"></textarea>
-                    </div>
-                    <div class="buttons">
-                        <button class="button-light button preview">Preview</button>
-                        <button id="submit-comment-button" class="button-light button submit">Submit</button>
-                    </div>
-                </div>
-                <p class="instructions">This bar will be where you will be able to take actions on code you select.</p>
+            <p class="filter-by-text"></p>
+            <div class="submissions">
+
+
             </div>
         </div>
+
         <script src="firebase4.0.js"></script>
-        <script src="showdown.min.js"></script>
+        <script src="Utils.js"></script>
         <script src="highlight.min.js"></script>
         <script src="jquery-3.2.1.slim.min.js"></script>
-        <script src="simplemde.min.js"></script>
-        <script src="Utils.js"></script>
+        <script src="taggle.min.js"></script>
         <script>
-            hljs.initHighlightingOnLoad();
+
+            function updateFilter() {
+                const tags = filterTags.getTagValues()
+                const tagsHtmlData = tags.reduce((accumulator, item, index) => {
+                    accumulator.push({
+                        "class": "filter-tag",
+                        "tag": "span",
+                        "data": item
+                    });
+
+                    if (tags.length !== 1 && index !== (tags.length - 1)) {
+                        accumulator.push({
+                            "class": "filter-tag-separator",
+                            "tag": "span",
+                            "data": ", "
+                        })
+                    }
+
+                    return accumulator;
+                }, []);
+                const tagStringHtml = composeHtml(tagsHtmlData);
+                $(".filter-by-text").text('filtering by ');
+                $(".filter-by-text").append(tagStringHtml);
+            }
+
+            const filterTags = new Taggle("filter-tags", {
+                duplicateTagClass: 'bounce',
+                placeholder: "Enter some tags to filter by",
+                onTagAdd: updateFilter,
+                onTagRemove: updateFilter
+            });
         </script>
-        <script src="App.js"></script>
     </body>
 </html>

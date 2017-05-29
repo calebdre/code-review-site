@@ -26,7 +26,6 @@ class SubmitButton {
             const submissionRefKey = submissionRef.key;
             database.ref(`users/${token}/submissions`)
                 .push(submissionRefKey);
-            console.log("done");
         });
     }
 }

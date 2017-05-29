@@ -1,0 +1,51 @@
+.container {
+    margin: 0 auto;
+    width: 70%;
+}
+
+.title-filter-bar {
+    width:100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.title-filter-bar .title {
+    margin :0;
+    align-self: flex-end;
+    font-family: 'Raleway', sans-serif;
+}
+.filter-tags {
+    position: relative;
+}
+
+.taggle_placeholder {
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.taggle_input {
+    width: 100% !important;
+    font-size: 13px;
+}
+.taggle_list {
+    padding: 8px 0 0 16px;
+}
+
+.taggle_list .taggle {
+    padding: 3px 18px 3px 8px;
+    font-size: 13px;
+}
+
+.filter-by-text {
+    margin-left: 8px;
+}
+
+.filter-by-text .filter-tag {
+    color:#ccc;
+}
+.submissions {
+    padding: 0 8px;
+}

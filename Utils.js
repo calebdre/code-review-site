@@ -100,7 +100,8 @@ class UserRepository {
 
     async getOrCreateGithubUser(accessToken) {
         return await new Promise((resolve, reject) => {
-            if (localStorage.getItem("current_user") !== null) {
+            if (localStorage.getItem("current_user") !== null &&
+                localStorage.getItem("access_token") !== null) {
                 resolve(JSON.parse(localStorage.getItem("current_user")));
             }
             this.database.ref("users")
