@@ -40,6 +40,10 @@ function attachListeners() {
     $(".button.toggle-preview").click(e => {
        commentEditor.togglePreview();
     });
+
+    $(".button.paste-selected-lines").click(e => {
+        commentEditor.pasteSelectedLines();
+    })
     commentEditor.applyListeners();
     codeDisplay.applyListeners();
 }
@@ -164,7 +168,7 @@ class CommentEditor {
         this._textarea = $("#commentbox");
         this._editor = new SimpleMDE({
             element: this._textarea.get(0),
-            toolbar: ["code", "preview", "guide"],
+            toolbar: ["code", "guide"],
             status: false,
             placeholder: "start writing your review"
         });
@@ -221,16 +225,16 @@ class CommentEditor {
     }
 
     pasteSelectedLines() {
-        let selectedLinesByFile = codeDisplay.getSelectedLines();
-        const keys = Object.keys(selectedLinesByFile);
-        let linesContent = "";
-        for(var i = 0; i < keys.length; i++){
-            let lines = selectedLinesByFile[keys[i]];
-            const display = codeDisplay.getCodeDisplay(i);
-            lines.forEach(lineNum => {
-                linesContent += display.getLineText(lineNum) + "\n";
-            });
+        let linesContent = "```\n";
+        for(var i = 0; i < codeDisplay.getCodeDisplayCount(); i++){
+            let display = codeDisplay.getCodeDisplay(i);
+            let content = display.getSelectedLines().map(item => {
+                return display.getLineText(item - 1) + "\n";
+            }).join("");
+            linesContent += content;
         }
+
+        linesContent += "```";
 
         this._editor.codemirror.replaceSelection(linesContent);
     }
@@ -338,12 +342,19 @@ class CodeDisplay {
                 this.linesCounter.decrement($target.index() + 1);
             }
         });
+
+        this._$display.find(".title").click(e => {
+            this.collapseDisplay();
+        });
     }
 
     generateHtml() {
         const htmlData = {
             "class": "file", "tag": "div", "children": [
-                {"class": "title", "tag": "p", "data": this._file["name"]},
+                {"class": "title", "tag": "p", "children": [
+                    {"class": "fa fa-caret-down collapse-button", "tag": "i"},
+                    {"class": "", "tag": "span", "data": this._file["name"]}
+                ]},
                 {"class": "display", "tag": "div", "children" : [
                     {"class": "linenums", "tag": "pre"},
                     {"class": "code-container", "tag": "pre", "children": [
@@ -367,6 +378,26 @@ class CodeDisplay {
 
     getFileName() {
         return this._file["name"];
+    }
+
+    collapseDisplay() {
+        const $display = this._$display.find(".display");
+        if (this.displayHeight === undefined) {
+            this.displayHeight = $display.height();
+        }
+
+        const toHeight = ($display.hasClass("collapsed")) ? this.displayHeight : "0px";
+        this._$display.find(".collapse-button").toggleClass("collapsed");
+        if (toHeight !== "0px") {
+            $display.css("display","flex");
+        }
+        $display.animate({"height": toHeight}, 400, () => {
+            $display.toggleClass("hidden");
+            $display.toggleClass("collapsed");
+            if (toHeight === "0px") {
+                $display.css("display","none");
+            }
+        });
     }
 
     /**

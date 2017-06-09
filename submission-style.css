@@ -64,33 +64,48 @@
     display: flex;
 }
 
-.action-bar .comment {
-    /*flex:1;*/
-}
-
-.comment .submit{
-    margin-left: 8px;
-}
-
 .comment .buttons {
     position: absolute;
-    bottom: 16px;
-    right: 16px;
+    bottom: 24px;
+    right: 32px;
     z-index: 2;
 }
 
+.comment .paste-selected-lines {
+    margin-right:12px;
+}
+
+.comment .toggle-preview {
+    margin-right: 12px;
+}
+
 .editor-container .file .display {
-    flex: 1;
     display: flex;
     padding: 0 0 0 24px;
     background: #F0F0F0;
 }
 
+.file .display.hidden {
+    display:none;
+}
+
 .file .title {
-    padding:8px 0 8px 64px;
+    padding:12px 0 12px 64px;
     font-weight:300;
+    margin:0;
     background-color: #E0E0E0;
     color: #777;
+    cursor: pointer;
+}
+
+.file .collapse-button {
+    display: inline-block;
+    margin-right: 16px;
+    transition: .4s all ease-in-out;
+}
+
+.file .collapse-button.collapsed {
+    transform: rotate(-90deg);
 }
 
 .editor-container .file .code-container {
