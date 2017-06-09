@@ -1,19 +1,16 @@
-.user-comment .time-since {
-    margin:0;
-    font-size:12px;
-}
-
-.user-comment .username {
-    margin-bottom:4px;
-    margin-top:0;
-}
-
 .color-muted {
     color:#888;
 }
 
 .block {
     display:flex;
+}
+
+.editor-container .files {
+    background: #F0F0F0;
+    height: 100vh;
+    overflow-y: scroll;
+    flex-grow: 1;
 }
 
 .hljs {
@@ -35,14 +32,18 @@
     background-color: #bfbfbf;
 }
 
+.hljs div.highlighted {
+    background-color: #dedede;
+}
+
 .linenums {
     background-color: #F0F0F0;
     border-right:1px solid #ddd;
 }
 
 .linenums div {
-    padding-top: 4.3px;
-    padding-bottom: 4.3px;
+    padding-top: 4px;
+    padding-bottom: 4px;
     display: block;
     text-align: center;
 }
@@ -54,7 +55,9 @@
 
 .hljs > div, .linenums div {
     padding-left: 8px;
+    min-height:16px;
     padding-right: 8px;
+    transition:.3s all ease-in-out;
 }
 
 .editor-container {
@@ -62,7 +65,7 @@
 }
 
 .action-bar .comment {
-    margin-top:16px;
+    /*flex:1;*/
 }
 
 .comment .submit{
@@ -70,37 +73,44 @@
 }
 
 .comment .buttons {
-    margin-top: 16px;
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 2;
 }
 
-.editor-container .code {
-    flex: 2;
+.editor-container .file .display {
+    flex: 1;
     display: flex;
-    padding: 16px 24px;
+    padding: 0 0 0 24px;
     background: #F0F0F0;
 }
 
-.editor-container .code .codecode {
+.file .title {
+    padding:8px 0 8px 64px;
+    font-weight:300;
+    background-color: #E0E0E0;
+    color: #777;
+}
+
+.editor-container .file .code-container {
     flex: 1;
 }
 
 .editor-container .action-bar {
-    flex: 1;
+    flex: 2;
     /*https://scotch.io/tutorials/a-visual-guide-to-css3-flexbox-properties*/
     background-color: #444;
     color: #fff;
-    padding: 16px 0;
+    height:100vh;
     text-align: left;
+    display: flex;
+    flex-direction: column;
 }
 
 .action-bar .all-comments {
-    margin-left: 0;
-    margin-right: 0;
-}
-
-.all-comments .user-comment{
-    background-color: #555;
-    padding: 8px 16px;
+    height:60vh;
+    overflow-y: scroll;
 }
 
 .all-comments .comment-separator {
@@ -116,10 +126,6 @@
     height: 1px;
     margin: 0;
 }
-.action-bar > * {
-    margin-left: 24px;
-    margin-right: 24px;
-}
 
 .action-bar .section-title{
     color:#888;
@@ -128,25 +134,96 @@
     font-family: 'Raleway', sans-serif;
 }
 
+.user-comment {
+    transition:.3s all ease-in-out;
+    padding: 0 40px 0 16px;
+    border-bottom: 1px solid #5f5f5f;
+    display: flex;
+}
+
+.user-comment.selected {
+    background-color: #545454;
+}
+
+.user-comment .upvote-area {
+    padding: 8px 24px 0;
+}
+
+.upvote-area .upvote-count {
+    display: block;
+    text-align: center;
+}
+
+.upvote-area .upvote-holder .fa{
+    font-size: 20px;
+}
+
+.user-comment .comment-area {
+    display: flex;
+    flex-direction: column;
+    flex:1;
+    padding: 8px 0 16px;
+}
+
+.comment-area .user-info {
+    display: flex;
+}
+
+.user-info .profile-picture {
+    max-width:50px;
+    margin-right: 12px;
+}
+
+.user-info .profile-area {
+    flex:1;
+    text-align: right;
+}
+
+.profile-area figure {
+    margin: 0;
+}
+
+.profile-area .profile-info {
+    display: inline-block;
+}
+
+.profile-info .username{
+    display: block;
+    margin-bottom:16px;
+}
+
+.profile-info .reputation{
+    display: block;
+    text-align:left;
+}
+
+.user-info .posted-time-area {
+    align-self: flex-end;
+}
+
+.user-info .view-code {
+    cursor:pointer;
+    font-size:12px;
+    color:#888;
+}
+
+.user-info .posted-time {
+    color:#999;
+    font-size:11px;
+    margin:0;
+}
+
+.comment .CodeMirror {
+    border-radius: 0;
+    height:100%;
+}
+
 .action-bar .comment .editor-toolbar {
     background-color: #fff;
     opacity: 1;
-}
-
-.action-bar .comment .CodeMirror {
-    height: 200px;
-    min-height: initial;
+    border-radius: 0;
 }
 
 .action-bar .comment .editor-statusbar {
     color:#fff;
-}
-
-.inline-block {
-    display: inline-block;
-}
-
-.comment-editor {
-    height:100px;
-    display: block;
 }

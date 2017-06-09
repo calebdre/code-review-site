@@ -13,12 +13,25 @@ function getURLParameter(name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
 }
 
+function pick(what, from) {
+    return what.reduce((accumulator, iteration) => {
+        if(from.hasOwnProperty(iteration)) {
+            accumulator[iteration] = from[iteration];
+        }
+        return accumulator;
+    }, {});
+}
+
 /**
  * @param Object data
  * @returns $
  */
 function composeHtml(data) {
     const dataItem = Array.isArray(data) ? data[0] : data;
+
+    if (!dataItem.hasOwnProperty("tag")) {
+        throw "Tag is required";
+    }
 
     dataItem["tag"] = `<${dataItem["tag"]}>`;
     const $el = $(dataItem["tag"]);
@@ -27,11 +40,18 @@ function composeHtml(data) {
         $el.addClass(dataItem["class"]);
     }
 
+    if (dataItem.hasOwnProperty("id")) {
+        $el.addClass(dataItem["id"]);
+    }
+
     if (dataItem.hasOwnProperty("data")) {
         $el.html(dataItem["data"]);
     }
 
     if (dataItem.hasOwnProperty("attrs")) {
+        if (!Array.isArray(dataItem["attrs"])) {
+            throw "attr must be an array";
+        }
         dataItem["attrs"].forEach(attr => {
            $el.attr(attr["name"], attr["value"]);
         });
@@ -61,6 +81,15 @@ function generateUUID () { // Public Domain/MIT
         d = Math.floor(d / 16);
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
+}
+
+function replaceObjeysByKeyWithArray(obj) {
+    return Object.keys(obj).reduce((accumulator, item) => {
+        let newItem = obj[item];
+        newItem["key"] =  item;
+        accumulator.push(newItem);
+        return accumulator;
+    }, []);
 }
 
 class LoginService {
@@ -102,12 +131,41 @@ class SubmissionsRepository {
     async all() {
         const t = await this.database.ref("/submissions").once("value");
         const subs = t.val();
-        return Object.keys(subs).reduce((accumulator, item) => {
-            let newItem = subs[item];
-            newItem["key"] =  item;
-            accumulator.push(newItem);
-            return accumulator;
-        }, []);
+        return replaceObjeysByKeyWithArray(subs);
+    }
+
+    async get(key) {
+       return (await this.database.ref(`submissions/${key}`).once("value")).val();
+    }
+}
+
+class CommentRepository {
+    constructor(submissionKey) {
+        this.database = firebase.database();
+        this.submissionKey = submissionKey;
+    }
+
+    _comment(props) {
+        return pick([
+            "user",
+            "postTime",
+            "commentHtml",
+            "lines"
+        ], props);
+    }
+
+    async getAll() {
+        return replaceObjeysByKeyWithArray((await this.database.ref(`submissions/${this.submissionKey}/comments`).once("value")).val());
+    }
+
+    async create(comment) {
+        comment = this._comment(comment);
+        if (Object.keys(comment).length === 0) {
+            throw "supplied params don't match what is needed to create a new comment";
+        }
+
+        await this.database.ref(`submissions/${this.submissionKey}/comments`)
+            .push(comment);
     }
 }
 
@@ -117,18 +175,13 @@ class UserRepository {
     }
 
     _user(props) {
-        return [
+        return pick([
             "avatar_url",
             "email",
             "name",
             "login",
             "url"
-        ].reduce((accumulator, iteration) => {
-            if(props.hasOwnProperty(iteration)) {
-                accumulator[iteration] = props[iteration];
-            }
-            return accumulator;
-        }, {});
+        ], props);
     }
 
     async getOrCreateGithubUser(accessToken) {

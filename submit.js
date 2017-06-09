@@ -141,7 +141,7 @@ class FileList {
 }
 
 //https://dribbble.com/shots/1856405-Taringa-Creacion-de-post
-CodeMirror.modeURL = "/code_review_site_not_react/mode/%N/%N.js"
+// CodeMirror.modeURL = "/code_review_site_not_react/mode/%N/%N.js"
 var editor = CodeMirror.fromTextArea($("#input-code").get(0), {
     "lineNumbers": true,
     "placeholder": "console.log('Hello world!');"

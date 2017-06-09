@@ -54,6 +54,16 @@ a:hover {
     color:#fff;
 }
 
+.button-blue {
+    border: 1px solid #1b6cd0;
+    color:#1b6cd0;
+}
+
+.button-blue:hover {
+    background-color: #1b6cd0;
+    color:#fff;
+}
+
 .button-light {
     border: 1px solid #fff;
     color: white;

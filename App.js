@@ -1,50 +1,34 @@
-async function fetchReviews() {
-    let t = await fetch("comments.json")
-        .then((r) => r.json())
-    return t;
-}
-
-function onLineClick(e) {
-    const $target = $(e.currentTarget).parent();
-
-    $target.toggleClass("active");
-    if ($target.hasClass("active")) {
-        lineNumberCounter.increment($target.index() + 1);
-    } else if (!$target.hasClass("active")) {
-        lineNumberCounter.decrement($target.index() + 1);
-    }
-}
-
-function generateLineNumbers() {
-    $("#code").text()
+function generateLineNumbers($codeRef, $lineNumsRef) {
+    $codeRef.text()
         .split("\n")
-        .slice(0,-1)
         .map((el, i) => {
-            return $("<div>", {
-                text: (i+1)
-            });
+            const data = [
+                {"class": "", "tag": "div", "data": i + 1}
+            ]
+            return composeHtml(data);
         }).forEach((item) => {
-        $(".linenums").append(item);
-    });
+            $lineNumsRef.append(item);
+        }
+    );
 }
 
-function transformCodeHtml() {
-    const $code = $("#code");
-    let mapped = $code.html()
+function transformCodeHtml($codeRef) {
+    let mapped = $codeRef.html()
         .split("\n")
-        .map((el) => {
-            return $("<div>")
-                .append($("<div>").append(el));
+        .map((el, i) => {
+            const data = [
+                {"class": "","tag": "div", "data": el}
+            ]
+            return composeHtml(data);
         })
         .reduce((accumulator, el) => {
             return accumulator + el.get(0).outerHTML;
         }, "");
 
-    $code.html(mapped);
+    $codeRef.html(mapped);
 }
 
 function attachListeners() {
-    $('#code > div > div').click(onLineClick);
     $("body").mouseup((e) => {
         window.isMouseDown = false;
     });
@@ -53,39 +37,17 @@ function attachListeners() {
         window.isMouseDown = true;
     });
 
-    previewButton.applyListener();
-    commentEditor.applyListeners();
-
-    $("#code > div").mouseenter((e) => {
-        if (window.isMouseDown === true) {
-            const $el = $(e.currentTarget);
-            $el.toggleClass("active");
-            if ($el.hasClass("active")) {
-                lineNumberCounter.increment($el.index() + 1);
-            } else {
-                lineNumberCounter.decrement($el.index() + 1);
-            }
-        }
+    $(".button.toggle-preview").click(e => {
+       commentEditor.togglePreview();
     });
-}
-
-function applyReview(item) {
-    item["comments"].forEach((comment => {
-        // applyComment(comment);
-    }));
+    commentEditor.applyListeners();
+    codeDisplay.applyListeners();
 }
 
 class CommentList {
     constructor() {
         this._$commentsContainer = $(".all-comments");
         this._list = [];
-    }
-
-    /**
-     * @param UserComment[] list
-     */
-    setList(list) {
-        this._list = list;
     }
 
     render() {
@@ -96,6 +58,19 @@ class CommentList {
         }
 
         this._$commentsContainer.append(htmlComments);
+    }
+
+    /**
+     * @param CommentRepository.Comment[] data
+     */
+    fromData(data) {
+        if (Array.isArray(data)) {
+            data.forEach(item => {
+                this.append(new UserComment(item));
+            });
+        } else {
+            this.append(new UserComment(data));
+        }
     }
 
     /**
@@ -114,21 +89,73 @@ class UserComment {
     }
 
     generateHtml() {
+        const upvotes = this._data.upvotes === undefined ? 0 : this._data.upvotes;
+        const imageUrl = this._data.user.avatar_url;
+        const username = this._data.user.login;
+        const postedTime = moment(this._data.postTime).fromNow();
+        const commentHtml = this._data.commentHtml;
+        const reputation = this._data.reputation === undefined ? 0 : this._data.reputation;
+        const viewCodeInEditorText = "see in code view"
         var elData = [
             {"class" : "user-comment", "tag": "div", "children": [
-                {"class":  "username", "tag": "p", "data": this._data["user"]},
-                {"class":  "time-since color-muted", "tag": "p", "data": this._data["postTime"]},
-                {"class":  "comment-wrapper", "tag": "div", "data": this._data["commentHtml"]}
-            ]
-            },
-            {"class": "comment-separator", "tag": "hr"}
+                {"class":  "upvote-area", "tag": "div", "children" : [
+                    {"class": "upvote-holder", "tag": "div", "children": [
+                        {"class": "fa fa-caret-up", "tag": "i"},
+                        {"class": "upvote-count", "tag": "span", "data": upvotes}
+                    ]},
+                ]},
+                {"class": "comment-area", "tag": "div", "children": [
+                    {"class": "comment", "tag": "div", "data": commentHtml},
+                    {"class": "user-info", "tag": "div", "children": [
+                        {"class": "posted-time-area", "tag": "div", "children": [
+                            {"class": "view-code", "tag": "a", "data": viewCodeInEditorText},
+                            {"class": "posted-time", "tag": "p", "data": "posted " + postedTime},
+                        ]},
+                        {"class": "profile-area", "tag": "div", "children": [
+                            {"class": "", "tag": "figure", "children": [
+                                {"class": "profile-picture", "tag": "img", "attrs": [{
+                                    "name": "src", "value": imageUrl
+                                }]},
+                                {"class":"profile-info", "tag": "figcaption", "children": [
+                                    {"class":"username", "tag": "span", "data": username},
+                                    {"class": "reputation", "tag": "span", "data": reputation}
+                                ]}
+                            ]}
+                        ]}
+                    ]}
+                ]}
+            ]}
         ];
 
-        return composeHtml(elData);
+        const $html = composeHtml(elData);
+        this.bindListeners($html);
+        return $html;
     }
 
     applyHoverListener() {
         // $("");
+    }
+
+    bindListeners($html) {
+        $html.find(".view-code").click(e => {
+            $html.parent().find(".selected").removeClass("selected")
+            $html.addClass("selected");
+            for (var key in this._data["lines"]) {
+                const fileName = this._data["lines"][key]["filename"] + "." + this._data["lines"][key]["extension"];
+                for (let i = 0; i < codeDisplay.getCodeDisplayCount(); i++) {
+                    if (codeDisplay.getCodeDisplay(i).getFileName() === fileName) {
+                        const lines = this._data["lines"][key]["lines"].split(",");
+                        lines.map(item => {
+                            return item + 1;
+                        });
+                        if (lines.length > 0 && lines[0] !== "") {
+
+                            codeDisplay.getCodeDisplay(i).highlightLines(lines);
+                        }
+                    }
+                }
+            }
+        });
     }
 }
 
@@ -137,31 +164,75 @@ class CommentEditor {
         this._textarea = $("#commentbox");
         this._editor = new SimpleMDE({
             element: this._textarea.get(0),
-            toolbar: false,
-            status: false
+            toolbar: ["code", "preview", "guide"],
+            status: false,
+            placeholder: "start writing your review"
         });
         this._submitButton = $("#submit-comment-button");
     }
 
     applyListeners() {
         this._submitButton.click((e) => {
+            const fileData = codeDisplay.getSelectedLines();
+            let hasAtLeastOneLineSelectedInFile = false;
+            for (let key in fileData) {
+                if (fileData[key].length !== 0) {
+                    hasAtLeastOneLineSelectedInFile = true;
+                    const lines = fileData[key].join(",");
+                    fileData[key] = {lines: lines};
+                } else {
+                    fileData[key] = {lines: ""};
+                }
+
+
+                const splitted = key.split(".");
+                const filename = splitted.slice(0, splitted.length - 1).join("");
+                const extension = splitted[splitted.length - 1];
+                const newKey = splitted.join("");
+                fileData[newKey] = fileData[key];
+                delete fileData[key];
+                fileData[newKey]["filename"] = filename;
+                fileData[newKey]["extension"] = extension;
+            }
+
+            if (!hasAtLeastOneLineSelectedInFile) {
+                alert("Please select lines to apply your review to.");
+                return;
+            }
+
             const commentData = {
-                "user": "username",
-                "postTime" : "right now",
+                "user": userRepo.getCurrentUser(),
+                "postTime" : Date.now(),
                 "commentHtml": showdownConverter.makeHtml(this.getCommentMarkdown()),
-                "lines": lineNumberCounter.getSelectedLines()
+                "lines": fileData
             };
 
+            commentRepo.create(commentData);
             commentList.append(new UserComment(commentData));
         });
     }
 
-    togglePreview() {
+    getCommentMarkdown() {
+        return this._editor.value();
+    }
+
+    togglePreview(){
         this._editor.togglePreview();
     }
 
-    getCommentMarkdown() {
-        return this._editor.value();
+    pasteSelectedLines() {
+        let selectedLinesByFile = codeDisplay.getSelectedLines();
+        const keys = Object.keys(selectedLinesByFile);
+        let linesContent = "";
+        for(var i = 0; i < keys.length; i++){
+            let lines = selectedLinesByFile[keys[i]];
+            const display = codeDisplay.getCodeDisplay(i);
+            lines.forEach(lineNum => {
+                linesContent += display.getLineText(lineNum) + "\n";
+            });
+        }
+
+        this._editor.codemirror.replaceSelection(linesContent);
     }
 }
 
@@ -175,13 +246,13 @@ class SelectedLinesCounter {
     increment(index) {
         this._count++;
         this.selectedLines.push(index);
-        this._refreshText();
+        // this._refreshText();
     }
 
     decrement(index) {
         this._count--;
         this.selectedLines.splice(this.selectedLines.indexOf(index), 1);
-        this._refreshText();
+        // this._refreshText();
     }
 
     getSelectedLines() {
@@ -193,49 +264,146 @@ class SelectedLinesCounter {
     }
 }
 
-class PreviewButtonState {
+class CodeDisplayList {
     constructor() {
-        this._isPreviewActive = false;
-        this._el = $(".comment .buttons .preview");
+        this._$list = $(".files");
+        this._displays = [];
     }
 
-    togglePreview() {
-        this._isPreviewActive = !this._isPreviewActive;
-        commentEditor.togglePreview();
+    applyListeners() {
+        this._displays.forEach(display => {
+            display.applyListeners();
+        })
+    }
 
-        if (this._isPreviewActive) {
-            this._el.text("Edit");
-        } else {
-            this._el.text("Preview");
+    append(files) {
+        for (var i = 0; i < files.length; i++) {
+            const file = files[i];
+            const display = new CodeDisplay(file);
+            const $filesHtml = display.generateHtml();
+            this._displays.push(display);
+            this._$list.append($filesHtml);
+            const $codeRef = $filesHtml.find(".code");
+            hljs.highlightBlock($codeRef.get(0));
+            generateLineNumbers($codeRef, $filesHtml.find(".linenums"));
+            transformCodeHtml($codeRef);
         }
     }
 
-    applyListener() {
-        this._el.click(this.togglePreview.bind(this));
+    getCodeDisplay(index) {
+        return this._displays[index];
+    }
+
+    getCodeDisplayCount() {
+        return this._displays.length;
+    }
+
+    /**
+     * @returns { filename: [selected_line_numbers] }
+     */
+    getSelectedLines() {
+        return this._displays.reduce((accumulator, item) => {
+            accumulator[item.getFileName()] = item.getSelectedLines();
+            return accumulator;
+        }, {});
     }
 }
 
-class ReviewsRepository {
-    constructor() {
-        this.database = firebase.database();
+class CodeDisplay {
+    constructor(file) {
+        this._file = file;
+        this.linesCounter = new SelectedLinesCounter();
+    }
+
+    applyListeners() {
+        this._$display.find('.code > div').mouseenter((e) => {
+            if (window.isMouseDown === true) {
+                const $el = $(e.currentTarget);
+                $el.toggleClass("active");
+                if ($el.hasClass("active")) {
+                    this.linesCounter.increment($el.index() + 1);
+                } else {
+                    this.linesCounter.decrement($el.index() + 1);
+                }
+            }
+        });
+
+        this._$display.find('.code > div').click(e => {
+            const $target = $(e.currentTarget);
+
+            $target.toggleClass("active");
+            if ($target.hasClass("active")) {
+                this.linesCounter.increment($target.index() + 1);
+            } else if (!$target.hasClass("active")) {
+                this.linesCounter.decrement($target.index() + 1);
+            }
+        });
+    }
+
+    generateHtml() {
+        const htmlData = {
+            "class": "file", "tag": "div", "children": [
+                {"class": "title", "tag": "p", "data": this._file["name"]},
+                {"class": "display", "tag": "div", "children" : [
+                    {"class": "linenums", "tag": "pre"},
+                    {"class": "code-container", "tag": "pre", "children": [
+                        {"class": "code", "tag": "code", "data": this._file["content"]}
+                    ]}
+                ]}
+            ]
+        };
+
+        this._$display = composeHtml(htmlData);
+        return this._$display;
+    }
+
+    getLineText(lineNum) {
+        return this._$display.find(".code div").eq(lineNum).text();
+    }
+
+    getSelectedLines() {
+        return this.linesCounter.getSelectedLines();
+    }
+
+    getFileName() {
+        return this._file["name"];
+    }
+
+    /**
+     * @param int[] lines
+     */
+    highlightLines(lines) {
+        const $codeLines = this._$display.find(".code > div");
+        $codeLines.removeClass("highlighted");
+
+        for(var i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            $codeLines
+                .eq(line)
+                .addClass("highlighted")
+        }
     }
 }
 
 const commentList = new CommentList();
 const commentEditor = new CommentEditor();
-const previewButton = new PreviewButtonState();
-const lineNumberCounter = new SelectedLinesCounter();
-const showdownConverter = new showdown.Converter();
+const showdownConverter = new showdown.Converter({
+    "headerLevelStart": 5,
+    "tables": true
+});
+const userRepo = new UserRepository();
+const subKey = getURLParameter("key");
+const commentRepo = new CommentRepository(subKey);
+const subRepo = new SubmissionsRepository();
+const codeDisplay = new CodeDisplayList();
 
-$('document').ready(() => {
-    generateLineNumbers();
-    transformCodeHtml();
+subRepo.get(subKey).then(sub => {
+    codeDisplay.append(sub.files);
     attachListeners();
+});
 
-    const reviews = fetchReviews();
-    reviews.then((r) => {
-        r['reviews'].forEach((item) => {
-            applyReview(item);
-        });
-    });
+commentRepo.getAll().then(commentsData => {
+   if (commentsData !== null) {
+       commentList.fromData(commentsData);
+   }
 });
