@@ -93,7 +93,16 @@ class UserComment {
     }
 
     generateHtml() {
-        const upvotes = this._data.upvotes === undefined ? 0 : this._data.upvotes;
+        let userUpvotedClass = "";
+        let upvotes = 0;
+        if (this._data.upvotes !== undefined) {
+            const currentUserKey = userRepo.getCurrentUserToken();
+            const keys = Object.keys(this._data.upvotes);
+            userUpvotedClass = keys.indexOf(currentUserKey) !== -1 ? "upvoted": "";
+            upvotes = keys.length;
+            console.log(this._data);
+        }
+
         const imageUrl = this._data.user.avatar_url;
         const username = this._data.user.login;
         const postedTime = moment(this._data.postTime).fromNow();
@@ -104,7 +113,7 @@ class UserComment {
             {"class" : "user-comment", "tag": "div", "children": [
                 {"class":  "upvote-area", "tag": "div", "children" : [
                     {"class": "upvote-holder", "tag": "div", "children": [
-                        {"class": "fa fa-caret-up", "tag": "i"},
+                        {"class": "fa fa-caret-up upvote-button " + userUpvotedClass, "tag": "i"},
                         {"class": "upvote-count", "tag": "span", "data": upvotes}
                     ]},
                 ]},
@@ -136,12 +145,28 @@ class UserComment {
         return $html;
     }
 
-    applyHoverListener() {
-        // $("");
-    }
-
     bindListeners($html) {
+        $html.find(".upvote-button").click(e => {
+            upvoteService.recordUpvote(subKey, userRepo.getCurrentUserToken(), this._data.key)
+                .then(recordingData => {
+                    if (recordingData.success) {
+                        const $upvoteButton = $(e.currentTarget);
+                        console.log(recordingData.upvote_count);
+                        $upvoteButton.parent().find(".upvote-count").text(recordingData.upvote_count);
+                        $upvoteButton.toggleClass("upvoted")
+                    }
+                });
+        });
+
         $html.find(".view-code").click(e => {
+            if ($html.hasClass("selected")) {
+                for (let i = 0; i <codeDisplay.getCodeDisplayCount(); i++) {
+                    codeDisplay.getCodeDisplay(i).removeHighlightedLines();
+                }
+                $html.removeClass("selected");
+                return;
+            }
+
             $html.parent().find(".selected").removeClass("selected")
             $html.addClass("selected");
             for (var key in this._data["lines"]) {
@@ -153,7 +178,6 @@ class UserComment {
                             return item + 1;
                         });
                         if (lines.length > 0 && lines[0] !== "") {
-
                             codeDisplay.getCodeDisplay(i).highlightLines(lines);
                         }
                     }
@@ -207,9 +231,10 @@ class CommentEditor {
             const commentData = {
                 "user": userRepo.getCurrentUser(),
                 "postTime" : Date.now(),
-                "commentHtml": showdownConverter.makeHtml(this.getCommentMarkdown()),
+                "commentHtml": new SimpleMDE().markdown(this.getCommentMarkdown()),
                 "lines": fileData
             };
+            console.log(commentData);
 
             commentRepo.create(commentData);
             commentList.append(new UserComment(commentData));
@@ -228,9 +253,12 @@ class CommentEditor {
         let linesContent = "```\n";
         for(var i = 0; i < codeDisplay.getCodeDisplayCount(); i++){
             let display = codeDisplay.getCodeDisplay(i);
-            let content = display.getSelectedLines().map(item => {
-                return display.getLineText(item - 1) + "\n";
-            }).join("");
+            let content = display.getSelectedLines()
+                .sort(((a, b) => a - b))
+                .map(item => {
+                    return display.getLineText(item - 1) + "\n";
+                })
+                .join("");
             linesContent += content;
         }
 
@@ -243,28 +271,21 @@ class CommentEditor {
 class SelectedLinesCounter {
     constructor() {
         this._count = 0;
-        this._$counterEl = $(".lines-selected");
         this.selectedLines = [];
     }
 
     increment(index) {
         this._count++;
         this.selectedLines.push(index);
-        // this._refreshText();
     }
 
     decrement(index) {
         this._count--;
         this.selectedLines.splice(this.selectedLines.indexOf(index), 1);
-        // this._refreshText();
     }
 
     getSelectedLines() {
         return this.selectedLines;
-    }
-
-    _refreshText() {
-        this._$counterEl.text(this._count + " lines selected.");
     }
 }
 
@@ -391,7 +412,7 @@ class CodeDisplay {
         if (toHeight !== "0px") {
             $display.css("display","flex");
         }
-        $display.animate({"height": toHeight}, 400, () => {
+        $display.animate({"height": toHeight}, 300, () => {
             $display.toggleClass("hidden");
             $display.toggleClass("collapsed");
             if (toHeight === "0px") {
@@ -414,14 +435,18 @@ class CodeDisplay {
                 .addClass("highlighted")
         }
     }
+
+    removeHighlightedLines() {
+        const $codeLines = this._$display.find(".code > div");
+        $codeLines.each(index => {
+            $codeLines.eq(index).removeClass("highlighted");
+        })
+    }
 }
 
 const commentList = new CommentList();
 const commentEditor = new CommentEditor();
-const showdownConverter = new showdown.Converter({
-    "headerLevelStart": 5,
-    "tables": true
-});
+const upvoteService = new UpvoteService();
 const userRepo = new UserRepository();
 const subKey = getURLParameter("key");
 const commentRepo = new CommentRepository(subKey);

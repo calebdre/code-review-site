@@ -169,6 +169,72 @@ class CommentRepository {
     }
 }
 
+class UpvoteService {
+    constructor() {
+        this.database = firebase.database();
+    }
+
+    /**
+     * returns true if the vote was recorded, false if the user has already upvoted
+     *
+     * @param String userKey
+     * @param String commentKey
+     * @returns {success: boolean, upvote_count: number, action: String}
+     */
+    async recordUpvote(submissionKey, userKey, commentKey) {
+        const path = `submissions/${submissionKey}/comments/${commentKey}/upvotes`;
+        const upvotesRef = await (this.database.ref(path));
+        const upvotes = await upvotesRef.once("value");
+        const oldVotesCount = upvotes.numChildren();
+
+        if (upvotes.exists) {
+            if (!upvotes.hasChild(userKey)) {
+                upvotesRef
+                    .child(userKey)
+                    .set(1);
+
+                var success = true;
+                var action = "added";
+                var newVotesCount = oldVotesCount + 1;
+            } else {
+                upvotesRef
+                    .child(userKey)
+                    .remove();
+                var action = "removed";
+                var success = true;
+                var newVotesCount = oldVotesCount - 1;
+            }
+        } else {
+            // this can't happen, right?
+            var success = false;
+        }
+
+        return {
+            "success": success,
+            "action": action,
+            "upvote_count": newVotesCount
+        };
+    }
+}
+
+class UserService {
+
+    async getUsedLanguages(accessToken) {
+        let headers = new Headers();
+        headers.append("Accept", "application/vnd.github.v3+json");
+        headers.append("Authorization", "token " + accessToken);
+        const  data = await fetch("https://api.github.com/user/repos", {
+            headers: headers,
+            method: "GET"
+        }).then(response => response.json());
+
+        return data
+            .map(item => item["language"])
+            .filter((item, pos, self) => self.indexOf(item) === pos)
+            .filter(item => item !== null);
+    }
+}
+
 class UserRepository {
     constructor() {
         this.database = firebase.database();
@@ -189,6 +255,7 @@ class UserRepository {
             if (localStorage.getItem("current_user") !== null &&
                 localStorage.getItem("access_token") !== null) {
                 resolve(JSON.parse(localStorage.getItem("current_user")));
+                return;
             }
             this.database.ref("users")
                 .child(accessToken)
@@ -196,6 +263,12 @@ class UserRepository {
                     if (snapshot.val() === null) {
                         resolve(await this.createUser(accessToken));
                     } else {
+                        const user = this._user(snapshot.val());
+                        const preferredLanguages = await new UserService().getUsedLanguages(accessToken);
+                        localStorage.setItem("current_user", JSON.stringify(user));
+                        localStorage.setItem("access_token", accessToken);
+                        localStorage.setItem("preferred_languages", preferredLanguages.join(","));
+
                         resolve(snapshot.val());
                     }
                 })
@@ -215,7 +288,13 @@ class UserRepository {
         await this.database.ref(`users/${accessToken}`).set(user);
         localStorage.setItem("current_user", JSON.stringify(user));
         localStorage.setItem("access_token", accessToken);
+        const preferredLanguages = await new UserService().getUsedLanguages(accessToken);
+        localStorage.setItem("preferred_languages", preferredLanguages.join(","));
         return user;
+    }
+
+    isUserLoggedIn() {
+        return localStorage.getItem("current_user") !== null;
     }
 
     getCurrentUser() {
@@ -224,5 +303,9 @@ class UserRepository {
 
     getCurrentUserToken() {
         return localStorage.getItem("access_token");
+    }
+
+    getCurrentUserPrefferedLanguages() {
+        return localStorage.getItem("preferred_languages");
     }
 }

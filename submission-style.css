@@ -64,6 +64,36 @@
     display: flex;
 }
 
+.comment-area .comment h1{
+    font-size:18px;
+}
+
+.comment-area .comment h2 {
+    font-size: 16px;
+}
+
+.comment-area .comment h3 {
+    font-size: 15px;
+}
+
+.comment-area .comment blockquote {
+    padding: 4px 0 4px 16px;
+    background-color: #555;
+    margin-left:0;
+}
+
+.comment-area .comment pre {
+    background-color: #555;
+    padding: 8px 0 8px 24px;
+    border: 1px solid #615c5c;
+    border-radius: 3px;
+}
+
+.comment-area .comment img {
+    max-width: 400px;
+}
+
+
 .comment .buttons {
     position: absolute;
     bottom: 24px;
@@ -124,7 +154,7 @@
 }
 
 .action-bar .all-comments {
-    height:60vh;
+    height:75vh;
     overflow-y: scroll;
 }
 
@@ -171,6 +201,14 @@
 
 .upvote-area .upvote-holder .fa{
     font-size: 20px;
+}
+
+.upvote-area .upvote-holder .fa.upvoted {
+    color:#74a6e4;
+}
+
+.upvote-area .upvote-holder .upvote-button {
+    cursor: pointer;
 }
 
 .user-comment .comment-area {
@@ -230,7 +268,8 @@
 
 .comment .CodeMirror {
     border-radius: 0;
-    height:100%;
+    height: 25vh;
+    padding-top: 0px;
 }
 
 .action-bar .comment .editor-toolbar {

@@ -1,24 +1,77 @@
+.hero{
+    color:#fff;
+    background: url("bg.jpg") no-repeat center center;
+    padding:216px 0;
+    text-align: center;
+    position: relative;
+}
+
+.hero .onTop{
+    position: relative;
+    z-index:2;
+}
+.hero:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(54,69,79, .65);
+}
+
+.hero h1 {
+    font-size:52px;
+    font-family: 'Raleway', sans-serif;
+}
+
+.hero h2 {
+    font-size:32px;
+    font-family: 'Raleway', sans-serif;
+    max-width:700px;
+    font-weight:100;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.hero .button {
+    margin-top:24px;
+}
+
+.hero .fa-github {
+    font-size:20px;
+    margin-left:8px;
+}
+
 .container {
     margin: 0 auto;
-    width: 60%;
+    width: 70%;
 }
 
 .title-filter-bar {
     width:100%;
-    display: flex;
-    justify-content: space-between;
+    margin:8px 0;
     padding: 8px;
+    display: flex;
+    align-items: center;
     border-bottom: 1px solid #ddd;
 }
 
 .title-filter-bar .title {
-    margin :0;
-    align-self: flex-end;
-    font-family: 'Raleway', sans-serif;
+    margin-right: 8px;
+    display: inline-block;
 }
+
+.title-filter-bar .taggle_list {
+    width: 100%;
+}
+
+.title-filter-bar .taggle_placeholder {
+    width: 200px;
+}
+
 .filter-tags {
     position: relative;
-    margin-bottom: -4px;
 }
 
 .taggle_placeholder {
@@ -60,18 +113,39 @@
 .submissions {
     padding: 0 8px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-flow: row wrap;
+    margin-bottom: 24px;
+}
+
+.submissions:after {
+    content: "";
+    flex-grow:1;
+    margin: 16px 6% 0 6%;
+    width: calc(100% * (1/5));
 }
 
 .submission {
-    padding: 16px 8px 16px 0;
+    padding: 16px;
     border-bottom: 1px solid #ddd;
-    margin-top: 4px;
+    margin: 16px 6% 0 6%;
+    flex-grow: 1;
+    display: flex;
+    flex-direction:column;
+    width: calc(100% * (1/5));
+}
+
+.submission:first-child, .submission:nth-child(n+2) {
+    margin-left:0;
+}
+
+.submission:last-child {
+    margin-right:0;
 }
 
 .submission .title {
     font-weight: 500;
-    font-size: 20px;
+    font-size: 16px;
     display: block;
     margin-top:0;
     margin-bottom: 8px;
@@ -102,8 +176,9 @@
 }
 
 .submission .meta-info {
-    margin-top: 4px;
+    margin-top: 12px;
     display: flex;
+    flex-grow: 1;
     justify-content: space-between;
 }
 
@@ -128,10 +203,14 @@
     margin: 0;
 }
 
+.submission .user-info {
+    align-self: flex-end;
+}
+
 .submission .post-time {
     font-size: 11px;
     color: #999;
-    align-self: flex-end;
     margin:0;
+    align-self: flex-end;
 }
 

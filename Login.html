@@ -11,29 +11,7 @@
     <script src="jquery-3.2.1.slim.min.js"></script>
     <script src="Utils.js"></script>
     <script>
-        class GithubLoginButton {
-            /**
-             * @param LoginService loginService
-             */
-            constructor(loginService) {
-                this.$button = $("#login-button");
-                this.loginService = loginService;
-            }
 
-            applyListeners() {
-                this.$button.attr("href", this.loginService.generateGithubAuthLink());
-                this.$button.click((e) => {
-                    e.preventDefault();
-
-                    loginService.recordLoginAttempt().then(() => {
-                        window.location = this.$button.attr("href");
-                    });
-                });
-            }
-        }
-
-        var loginService = new LoginService();
-        new GithubLoginButton(loginService).applyListeners();
     </script>
 </body>
 </html>

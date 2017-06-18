@@ -3,16 +3,27 @@
     <head>
         <meta charset="UTF-8">
         <title>Code Review Website - Home</title>
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500|Raleway:500" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500|Raleway:100,500" rel="stylesheet">
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
         <link rel="stylesheet" href="default.min.css">
         <link rel="stylesheet" href="taggle.css">
         <link rel="stylesheet" href="shared.css">
         <link rel="stylesheet" href="index-style.css">
     </head>
     <body>
+        <div class="hero">
+            <div class="onTop">
+                <hgroup>
+                    <h1>A Community to Explore Code Ideas With</h1>
+                    <h2>Explore and validate ideas through giving and receiving code reviews</h2>
+                </hgroup>
+
+                <a id="action-button" class="button button-big button-light" href="">Log in with Github <i class="fa fa-github"></i></a>
+            </div>
+        </div>
         <div class="container">
             <div class="title-filter-bar">
-                <p class="title">Review Requests</p>
+                <span class="title">filters:</span>
                 <div id="filter-tags" class="filter-tags"></div>
             </div>
 
@@ -21,6 +32,7 @@
         </div>
 
         <script src="firebase4.0.js"></script>
+        <script src="clamp.min.js"></script>
         <script src="Utils.js"></script>
         <script src="highlight.min.js"></script>
         <script src="jquery-3.2.1.slim.min.js"></script>
@@ -39,7 +51,7 @@
                     const avatar = submissionData["user"]["avatar_url"];
                     const postedTime = moment(submissionData["posted_time"]).fromNow();
                     const submissionUrl = "/submission.html?key=" + submissionData["key"];
-                    const numOfReviews = submissionData["num_of_reviews"] === undefined ? 0 : submissionData["num_of_reviews"];
+                    const numOfReviews = submissionData["comments"] === undefined ? 0 : Object.keys(submissionData["comments"]).length;
 
                     const submissionHtmlData = {
                         "class": "submission", "tag": "div", "children": [
@@ -67,17 +79,56 @@
                     }
 
                     const $html = composeHtml(submissionHtmlData);
+                    $clamp($html.find(".title").get(0), {clamp: 3});
                     $html.find(".tag").click(e => {
                         filterTags.add($(e.currentTarget).text());
                     })
                     this._submissionsHtml.append($html);
                     this._submissions.push(submissionData);
                 }
+
+                /**
+                 * @param String[] tags
+                 */
+                filterByTag(tags) {
+                    if (tags.length === 0) {
+                        var filtered = this._submissions;
+                    } else {
+                        var filtered = this._submissions
+                            .filter(item => item["tags"]
+                                .split(",")
+                                .some(tagUnderTest => tags.indexOf(tagUnderTest) !== -1)
+                            )
+                    }
+
+                    this._submissionsHtml.html("");
+                    filtered.forEach(item => this.append(item));
+                }
+            }
+
+            class HeaderActionButton {
+                /**
+                 * @param LoginService loginService
+                 */
+                constructor(loginService) {
+                    this.$button = $("#action-button");
+                    this.loginService = loginService;
+                }
+
+                applyListeners() {
+                    if (userRepo.isUserLoggedIn()) {
+                        this.$button.text("Get Your Code Reviewed");
+                        this.$button.attr("href", "/Submit.html");
+                    } else {
+                        this.$button.attr("href", this.loginService.generateGithubAuthLink());
+                    }
+                }
             }
 
             function updateFilter() {
                 const tags = filterTags.getTagValues()
                 const $filterText = $(".filter-by-text");
+                submissionList.filterByTag(tags);
                 if (tags.length === 0) {
                     $filterText.text("");
                     $filterText.addClass("hidden");
@@ -114,21 +165,27 @@
                 onTagAdd: updateFilter,
                 onTagRemove: updateFilter
             });
-
+            var loginService = new LoginService();
+            const userRepo = new UserRepository();
+            new HeaderActionButton(loginService).applyListeners();
             if (getURLParameter("access_token") !== null) {
-                const repo = new UserRepository();
-                const r = repo.getOrCreateGithubUser(getURLParameter("access_token"));
+                const r = userRepo.getOrCreateGithubUser(getURLParameter("access_token"));
                 r.then(e => {
-                    console.log(e);
+                    const languages = userRepo.getCurrentUserPrefferedLanguages();
+                    filterTags.add(languages.split(","));
                 });
+            } else {
+                const languages = userRepo.getCurrentUserPrefferedLanguages();
+                filterTags.add(languages.split(","));
             }
 
+            const submissionList = new SubmissionList();
             const submissionRepo = new SubmissionsRepository();
             submissionRepo.all()
                 .then(subs => {
-                    let list = new SubmissionList();
+
                     subs.forEach(sub => {
-                        list.append(sub);
+                        submissionList.append(sub);
                     });
                 });
         </script>

@@ -45,6 +45,12 @@ a:hover {
     text-transform: capitalize;
 }
 
+.button.button-big {
+    padding: 12px 20px;
+    font-size:18px;
+    text-transform: capitalize;
+}
+
 .button-dark {
     border: 1px solid #666;
     color: #666;
