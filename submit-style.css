@@ -11,6 +11,32 @@
     text-transform: lowercase;
 }
 
+.code-input .CodeMirror {
+    padding:0;
+}
+
+.context-input .CodeMirror, .context-input .CodeMirror-scroll {
+    min-height: 200px;
+}
+
+.context-input .CodeMirror, .context-input .editor-toolbar {
+    max-width: 600px;
+}
+
+.context-input{
+    margin-top: 8px;
+}
+
+.context-input label {
+    margin-bottom: 4px;
+    display: block;
+}
+
+.input-title {
+    margin-top:4px;
+    display: block;
+}
+
 .submission-container {
     width:70%;
     margin:24px auto;

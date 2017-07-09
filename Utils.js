@@ -97,13 +97,18 @@ class LoginService {
         this._githubState = "";
     }
 
-    generateGithubAuthLink() {
+    /**
+     * @param boolean redirect
+     * @returns string
+     */
+    generateGithubAuthLink(redirect) {
         const clientId = "d6c63e9c626024140ba6";
         const scope = "user:email user";
         const state = generateUUID();
         const redirectUri = "https://us-central1-d2l-scraper.cloudfunctions.net/registerGithub";
+        const r = redirect === undefined || !redirect ? 0 : 1;
 
-        const authLink = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`
+        const authLink = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&redirect=${r}`;
 
         this._githubState = state;
         return authLink;
@@ -232,6 +237,16 @@ class UserService {
             .map(item => item["language"])
             .filter((item, pos, self) => self.indexOf(item) === pos)
             .filter(item => item !== null);
+    }
+}
+
+class PageTracker {
+    update() {
+        localStorage.setItem("current_page", window.location);
+    }
+
+    getLastStoredPage(){
+        return localStorage.getItem("current_page");
     }
 }
 

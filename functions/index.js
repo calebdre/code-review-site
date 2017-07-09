@@ -43,7 +43,11 @@ exports.registerGithub = functions.https.onRequest((req, res) => {
             database.ref("/github-login-attempts/" + req.query.state)
                 .remove()
                 .then(ignored => {
-                    res.redirect(303, "http://localhost:8080?login_code=" + req.query.state + "&access_token=" + responseData.access_token);
+                    let redirectLink = "http://localhost:8080?login_code=" + req.query.state + "&access_token=" + responseData.access_token;
+                    if (req.query.redirect === 1) {
+                        redirectLink += "&redirect=1";
+                    }
+                    res.redirect(303, redirectLink);
                 });
         });
     });

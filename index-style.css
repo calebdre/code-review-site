@@ -50,7 +50,7 @@
 
 .title-filter-bar {
     width:100%;
-    margin:8px 0;
+    margin:16px 0;
     padding: 8px;
     display: flex;
     align-items: center;
@@ -58,8 +58,12 @@
 }
 
 .title-filter-bar .title {
+    margin-right: 64px;
+    font-size:16px;
+}
+
+.title-filter-bar .filter-text {
     margin-right: 8px;
-    display: inline-block;
 }
 
 .title-filter-bar .taggle_list {
@@ -114,7 +118,7 @@
     padding: 0 8px;
     display: flex;
     flex-direction: row;
-    flex-flow: row wrap;
+    flex-wrap: wrap;
     margin-bottom: 24px;
 }
 
@@ -126,17 +130,12 @@
 }
 
 .submission {
-    padding: 16px;
-    border-bottom: 1px solid #ddd;
-    margin: 16px 6% 0 6%;
-    flex-grow: 1;
+    margin: 16px 0 24px;
     display: flex;
-    flex-direction:column;
-    width: calc(100% * (1/5));
-}
-
-.submission:first-child, .submission:nth-child(n+2) {
-    margin-left:0;
+    flex-basis: calc(33.33% - 24px);
+    justify-content: center;
+    flex-direction: column;
+    transition: all .3s;
 }
 
 .submission:last-child {

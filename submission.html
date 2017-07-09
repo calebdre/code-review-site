@@ -12,17 +12,28 @@
         <link rel="stylesheet" href="submission-style.css">
     </head>
     <body>
-        <div class="editor-container">
-            <div class="files"></div>
-            <!-- inspiration: https://dribbble.com/shots/2739532-Code-Review/attachments/556005-->
-            <div class="action-bar">
-                <div class="all-comments"></div>
-                <div class="comment">
-                    <textarea id="commentbox"></textarea>
-                    <div class="buttons">
-                        <button class="button-dark button paste-selected-lines">Paste Selected Lines</button>
-                        <button class="button-dark button toggle-preview">Toggle Preview</button>
-                        <button id="submit-comment-button" class="button-blue button submit">Submit</button>
+        <div class="container">
+            <div class="header">
+                <h3 class="title"></h3>
+                <p class="description"></p>
+                <p class="post-time"></p>
+                <div class="tags"></div>
+                <div class="profile">
+                    <figure></figure>
+                </div>
+            </div>
+            <div class="editor-container">
+                <div class="files"></div>
+                <!-- inspiration: https://dribbble.com/shots/2739532-Code-Review/attachments/556005-->
+                <div class="action-bar">
+                    <div class="all-comments"></div>
+                    <div class="comment">
+                        <textarea id="commentbox"></textarea>
+                        <div class="buttons">
+                            <button class="button-dark button paste-selected-lines">Paste Selected Lines</button>
+                            <button class="button-dark button toggle-preview">Toggle Preview</button>
+                            <button id="submit-comment-button" class="button-blue button submit">Submit</button>
+                        </div>
                     </div>
                 </div>
             </div>

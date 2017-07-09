@@ -18,7 +18,8 @@ class SubmitButton {
                 "user": user,
                 "files": files,
                 "tags": tags.getTagValues().join(","),
-                "context": $("#input-context").val(),
+                "title": $("#input-title").val(),
+                "context": contextEditor.getText(),
                 "posted_time": Date.now()
             }
 
@@ -28,6 +29,22 @@ class SubmitButton {
             database.ref(`users/${token}/submissions`)
                 .push(submissionRefKey);
         });
+    }
+}
+
+class ContextEditor {
+    constructor () {
+        this.textarea = $("#input-context");
+        this.editor = new SimpleMDE({
+            element: this.textarea.get(0),
+            status: false,
+            hideIcons: ["side-by-side", "fullscreen"],
+            placeholder: "Give some context around the code and your implementation"
+        });
+    }
+
+    getText() {
+        return this.editor.markdown(this.editor.value());
     }
 }
 
@@ -140,6 +157,7 @@ class FileList {
     }
 }
 
+new PageTracker().update();
 //https://dribbble.com/shots/1856405-Taringa-Creacion-de-post
 // CodeMirror.modeURL = "/code_review_site_not_react/mode/%N/%N.js"
 var editor = CodeMirror.fromTextArea($("#input-code").get(0), {
@@ -160,6 +178,8 @@ $("#input-filename").keyup((e) => {
         $(".file-type").text(`${info.name}`);
     }
 });
+
+const contextEditor = new ContextEditor();
 
 const filetypeData = {
     "class": "file-type", "tag": "span"

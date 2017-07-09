@@ -231,13 +231,14 @@ class CommentEditor {
             const commentData = {
                 "user": userRepo.getCurrentUser(),
                 "postTime" : Date.now(),
-                "commentHtml": new SimpleMDE().markdown(this.getCommentMarkdown()),
+                "commentHtml": this._editor.markdown(this.getCommentMarkdown()),
                 "lines": fileData
             };
             console.log(commentData);
 
             commentRepo.create(commentData);
             commentList.append(new UserComment(commentData));
+            $(".all-comments").animate({ scrollTop: $('.all-comments').prop("scrollHeight")}, 400);
         });
     }
 
@@ -443,6 +444,8 @@ class CodeDisplay {
         })
     }
 }
+
+new PageTracker().update();
 
 const commentList = new CommentList();
 const commentEditor = new CommentEditor();

@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <title>Code Review Site - Submit</title>
         <link rel="stylesheet" href="codemirror.css">
+        <link rel="stylesheet" href="simplemde.min.css">
         <link rel="stylesheet" href="taggle.css">
         <link rel="stylesheet" href="shared.css">
         <link rel="stylesheet" href="submit-style.css">
@@ -12,17 +13,28 @@
     <body>
 
         <div class="submission-container">
-            <label for="input-context">Context</label>
-            <input class="input context-input" id="input-context" type="text" placeholder="Give some context around the code you're getting reviewed">
+            <p>Please log in with Github first</p>
+            <label for="input-title">Title</label>
+            <input class="input input-title" id="input-title" type="text" placeholder="What's the high level overview on what idea or implementation you want reviewed?">
+            <div class="context-input">
+                <label for="input-context">Context</label>
+                <textarea id="input-context" cols="30" rows="10"></textarea>
+            </div>
             <ul class="file-list"></ul>
             <div class="input-group">
                 <input class="filename-input input" id="input-filename" type="text" placeholder="filename (example.js)">
                 <button id="add-file" class="button button-dark button-small">add another file</button>
             </div>
-            <textarea name="code-input" id="input-code" cols="30" rows="10"></textarea>
-            <div id="input-tags" class="input-tags"></div>
+            <div class="code-input">
+                <textarea name="code-input" id="input-code" cols="30" rows="10"></textarea>
+                <div id="input-tags" class="input-tags"></div>
+            </div>
             <button class="button-dark button submit-button">Submit</button>
         </div>
+        <!--
+            For reviews, people are really just commenting on code. it'd
+            be good to group comments to actual reviews
+        -->
 
         <script src="firebase4.0.js"></script>
         <script src="jquery-3.2.1.slim.min.js"></script>
@@ -30,6 +42,7 @@
         <script src="codemirror.js"></script>
         <script src="loadmode.js"></script>
         <script src="placeholder.js"></script>
+        <script src="simplemde.min.js"></script>
         <script src="meta.js"></script>
         <script src="Utils.js"></script>
         <script src="submit.js"></script>

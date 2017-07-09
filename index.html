@@ -6,6 +6,7 @@
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500|Raleway:100,500" rel="stylesheet">
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
         <link rel="stylesheet" href="default.min.css">
+        <link rel="stylesheet" href="semantic.min.css">
         <link rel="stylesheet" href="taggle.css">
         <link rel="stylesheet" href="shared.css">
         <link rel="stylesheet" href="index-style.css">
@@ -21,14 +22,15 @@
                 <a id="action-button" class="button button-big button-light" href="">Log in with Github <i class="fa fa-github"></i></a>
             </div>
         </div>
-        <div class="container">
+        <div class="container" id="reviews">
             <div class="title-filter-bar">
-                <span class="title">filters:</span>
+                <span class="title">Recent Review Submissions</span>
+                <span class="filter-text">filters:</span>
                 <div id="filter-tags" class="filter-tags"></div>
             </div>
 
             <p class="filter-by-text hidden"></p>
-            <div class="submissions"></div>
+            <div class="ui link cards"></div>
         </div>
 
         <script src="firebase4.0.js"></script>
@@ -38,11 +40,13 @@
         <script src="jquery-3.2.1.slim.min.js"></script>
         <script src="taggle.min.js"></script>
         <script src="moment.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+
         <script>
             class SubmissionList {
                 constructor() {
                     this._submissions = [];
-                    this._submissionsHtml = $(".submissions");
+                    this._submissionsHtml = $(".ui.link.cards");
                 }
 
                 append(submissionData) {
@@ -54,32 +58,33 @@
                     const numOfReviews = submissionData["comments"] === undefined ? 0 : Object.keys(submissionData["comments"]).length;
 
                     const submissionHtmlData = {
-                        "class": "submission", "tag": "div", "children": [
-                            {"class" : "title", "tag": "a", "data": title, "attrs": [{"name": "href", "value": submissionUrl}]},
-                            {"class": "tags", "tag": "ul", "children":
-                                submissionData["tags"].split(",")
-                                    .map(item => {
-                                        return {"class": "tag", "tag": "li", "data": item}
-                                    })
-                            },
-                            {"class": "meta-info", "tag": "div", "children": [
-                                {"class": "reviews-count-container", "tag": "div", "children": [
-                                    {"class": "reviews-text", "tag" : "p", "data": "Reviews"},
-                                    {"class": "reviews-count", "tag" : "p", "data": numOfReviews}
-                                ]},
-                                {"class": "user-info", "tag": "div", "children": [
-                                    {"class": "user-image", "tag":"img", "attrs": [{"name": "src", "value": avatar}]},
+                        "class": "card", "tag": "a", "attrs": [{"name": "href", "value": submissionUrl}], "children": [
+                            {"class": "content", "tag": "div", "children": [
+                                {"class": "tags", "tag": "ul", "children":
+                                    submissionData["tags"].split(",")
+                                        .map(item => {
+                                            return {"class": "tag", "tag": "li", "data": item}
+                                        })
+                                }
+                            ]},
+                            {"class": "content", "tag": "div", "children": [
+                                {"class": "description", "tag":"div", "data": title}
+                            ]},
+                            {"class": "extra content", "tag": "div", "children": [
+                                {"class": "", "tag" : "span", "data": numOfReviews + " Reviews"},
+                                {"class": "right floated", "tag": "div", "children": [
+                                    {"class": "image user-image", "tag":"img", "attrs": [{"name": "src", "value": avatar}]},
                                     {"class": "username", "tag": "p", "children": [
                                         {"tag": "a", "attrs": [{"name": "href", "value": "https://github.com/" + userLogin}], "data": userLogin}
                                     ]},
                                     {"class": "post-time", "tag": "p", "data": "posted " + postedTime}
-                                ]},
+                                ]}
                             ]}
                         ]
                     }
 
                     const $html = composeHtml(submissionHtmlData);
-                    $clamp($html.find(".title").get(0), {clamp: 3});
+                    $clamp($html.find(".content .description").get(0), {clamp: 3});
                     $html.find(".tag").click(e => {
                         filterTags.add($(e.currentTarget).text());
                     })
@@ -167,23 +172,38 @@
             });
             var loginService = new LoginService();
             const userRepo = new UserRepository();
-            new HeaderActionButton(loginService).applyListeners();
-            if (getURLParameter("access_token") !== null) {
-                const r = userRepo.getOrCreateGithubUser(getURLParameter("access_token"));
-                r.then(e => {
-                    const languages = userRepo.getCurrentUserPrefferedLanguages();
-                    filterTags.add(languages.split(","));
-                });
-            } else {
-                const languages = userRepo.getCurrentUserPrefferedLanguages();
-                filterTags.add(languages.split(","));
-            }
-
             const submissionList = new SubmissionList();
+
             const submissionRepo = new SubmissionsRepository();
+
+            new Promise((resolve) => {
+                if (getURLParameter("access_token") !== null) {
+                    const r = userRepo.getOrCreateGithubUser(getURLParameter("access_token"));
+                    r.then(e => {
+                        const languages = userRepo.getCurrentUserPrefferedLanguages();
+                        filterTags.add(languages.split(","));
+                        resolve()
+                    });
+                } else {
+                    const languages = userRepo.getCurrentUserPrefferedLanguages();
+                    if (languages !== null) {
+                        filterTags.add(languages.split(","));
+                    }
+
+                    resolve()
+                }
+            }).then(() => {
+                new HeaderActionButton(loginService).applyListeners();
+            })
+
+            if (getURLParameter("redirect") !== null) {
+                const lastStoredPage = new PageTracker().getLastStoredPage();
+                if (lastStoredPage !== null && lastStoredPage !== window.location) {
+                    window.location = lastStoredPage;
+                }
+            }
             submissionRepo.all()
                 .then(subs => {
-
                     subs.forEach(sub => {
                         submissionList.append(sub);
                     });
