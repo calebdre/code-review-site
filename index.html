@@ -30,7 +30,7 @@
             </div>
 
             <p class="filter-by-text hidden"></p>
-            <div class="ui link cards"></div>
+            <div class="submissions"></div>
         </div>
 
         <script src="firebase4.0.js"></script>
@@ -46,7 +46,7 @@
             class SubmissionList {
                 constructor() {
                     this._submissions = [];
-                    this._submissionsHtml = $(".ui.link.cards");
+                    this._submissionsHtml = $(".submissions");
                 }
 
                 append(submissionData) {
@@ -57,34 +57,26 @@
                     const submissionUrl = "/submission.html?key=" + submissionData["key"];
                     const numOfReviews = submissionData["comments"] === undefined ? 0 : Object.keys(submissionData["comments"]).length;
 
+                    const usernameHtml = composeHtml({"tag": "a", "attrs": [{"name": "href", "value": "https://github.com/" + userLogin}], "data": userLogin})
                     const submissionHtmlData = {
-                        "class": "card", "tag": "a", "attrs": [{"name": "href", "value": submissionUrl}], "children": [
-                            {"class": "content", "tag": "div", "children": [
-                                {"class": "tags", "tag": "ul", "children":
-                                    submissionData["tags"].split(",")
-                                        .map(item => {
-                                            return {"class": "tag", "tag": "li", "data": item}
-                                        })
-                                }
+                        "class": "submission", "tag": "div", "children": [
+                            {"class" : "title", "tag": "a", "data": title, "attrs": [{"name": "href", "value": submissionUrl}]},
+                            {"class": "stats", "tag": "div", "children": [
+                                {"class": "stat stat-tags", "tag": "div", "children":[
+                                    {"class": "fa fa-tag", "tag": "span", "data": "&nbsp;&nbsp;"},
+                                    {"class": "stat", "tag": "span", "data": submissionData["tags"].split(",").join(", ")},
+                                ]},
+                                {"class": "stat stat-reviews", "tag": "div", "children":[
+                                    {"class": "fa fa-pencil", "tag": "span", "data": "&nbsp;&nbsp;"},
+                                    {"class": "stat", "tag": "span", "data": numOfReviews + ((numOfReviews === 1) ? " review" : " reviews")},
+                                ]},
+                                {"class": "stat stat-posted-time", "tag": "p", "data": "posted by " + usernameHtml.get(0).outerHTML + "&nbsp; " + postedTime},
                             ]},
-                            {"class": "content", "tag": "div", "children": [
-                                {"class": "description", "tag":"div", "data": title}
-                            ]},
-                            {"class": "extra content", "tag": "div", "children": [
-                                {"class": "", "tag" : "span", "data": numOfReviews + " Reviews"},
-                                {"class": "right floated", "tag": "div", "children": [
-                                    {"class": "image user-image", "tag":"img", "attrs": [{"name": "src", "value": avatar}]},
-                                    {"class": "username", "tag": "p", "children": [
-                                        {"tag": "a", "attrs": [{"name": "href", "value": "https://github.com/" + userLogin}], "data": userLogin}
-                                    ]},
-                                    {"class": "post-time", "tag": "p", "data": "posted " + postedTime}
-                                ]}
-                            ]}
                         ]
                     }
 
                     const $html = composeHtml(submissionHtmlData);
-                    $clamp($html.find(".content .description").get(0), {clamp: 3});
+                    $clamp($html.find(".title").get(0), {clamp: 3});
                     $html.find(".tag").click(e => {
                         filterTags.add($(e.currentTarget).text());
                     })

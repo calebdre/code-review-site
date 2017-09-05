@@ -6,6 +6,11 @@
     display:flex;
 }
 
+.container{
+    width:70%;
+    margin:0 auto;
+}
+
 .editor-container .files {
     background: #F0F0F0;
     height: 100vh;
@@ -151,6 +156,10 @@
     text-align: left;
     display: flex;
     flex-direction: column;
+}
+
+.action-bar .comment {
+    position: relative;
 }
 
 .action-bar .all-comments {

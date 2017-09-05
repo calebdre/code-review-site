@@ -160,7 +160,12 @@ class CommentRepository {
     }
 
     async getAll() {
-        return replaceObjeysByKeyWithArray((await this.database.ref(`submissions/${this.submissionKey}/comments`).once("value")).val());
+        const comments = (await this.database.ref(`submissions/${this.submissionKey}/comments`).once("value")).val();
+        if (comments !== null) {
+            return replaceObjeysByKeyWithArray(comments);
+        }
+
+        return comments;
     }
 
     async create(comment) {
