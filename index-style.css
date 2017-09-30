@@ -104,6 +104,7 @@
     margin-left: 8px;
     margin-bottom:0;
     color: #555;
+    margin-top: 12px;
 }
 
 .filter-by-text.hidden {
@@ -137,7 +138,7 @@
 
 .submission .title {
     font-weight: 500;
-    font-size: 16px;
+    font-size: 18px;
     display: block;
     margin-top:0;
     margin-bottom: 8px;
@@ -155,7 +156,7 @@
 .submission .stats .stat {
     display: inline-block;
     margin-right:16px;
-    font-size: 12px;
+    font-size: 14px;
     color: #586069;
 }
 

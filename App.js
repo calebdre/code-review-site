@@ -453,12 +453,44 @@ const upvoteService = new UpvoteService();
 const userRepo = new UserRepository();
 const subKey = getURLParameter("key");
 const commentRepo = new CommentRepository(subKey);
-const subRepo = new SubmissionsRepository();
 const codeDisplay = new CodeDisplayList();
+const subRepo = new SubmissionsRepository();
 
+
+function generateHeaderData(title, desctription, userLogin, tags, postedTime, numOfReviews) {
+    const usernameHtml = composeHtml({"tag": "a", "attrs": [{"name": "href", "value": "https://github.com/" + userLogin}], "data": userLogin})
+
+    return [
+        {"class": "title", "tag": "h2", "data": title},
+        {"class": "description", "tag": "div", "data": desctription},
+        {"class": "stats", "tag": "div", "children": [
+            {"class": "stat", "tag": "div", "children": [
+                {"class" :"fa fa-tag", "tag": "i", "data": " &nbsp; &nbsp;"},
+                {"class" :"stat-tags", "tag": "span", "data": tags.split(",").join(", ")},
+            ]},
+
+            {"class": "stat", "tag": "div", "children": [
+                {"class" :"fa fa-pencil", "tag": "i", "data": " &nbsp; &nbsp;"},
+                {"class" :"stat-reviews", "tag": "span", "data": numOfReviews + ((numOfReviews === 1) ? " review" : " reviews")},
+            ]},
+
+            {"class" :"stat stat-posted-time", "tag": "p", "data": "posted by " + usernameHtml.get(0).outerHTML + " " + postedTime}
+        ]}
+    ]
+}
 subRepo.get(subKey).then(sub => {
     codeDisplay.append(sub.files);
     attachListeners();
+    const $header = composeHtml(generateHeaderData(
+        sub["context"],
+        sub["description"],
+        sub["user"]["login"],
+        sub["tags"].split(",").join(", "),
+        moment(sub["posted_time"]).fromNow(),
+        sub["comments"] === undefined ? 0 : Object.keys(sub["comments"]).length
+    ));
+
+    $('.header').append($header);
 });
 
 commentRepo.getAll().then(commentsData => {

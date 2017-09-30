@@ -11,6 +11,31 @@
     margin:0 auto;
 }
 
+.nav-header {
+    padding: 16px 0;
+    border-bottom:1px solid #DCEDC8;
+}
+
+.nav-header .nav {
+    padding:0;
+    margin:0;
+    list-style-type: none;
+    text-align: right;
+}
+
+
+.nav .nav-item {
+    display: inline-block;
+    margin-left:24px;
+    font-size:13px;
+    cursor: pointer;
+}
+
+.stats .stat{
+    display: block;
+    margin-bottom:8px;
+}
+
 .editor-container .files {
     background: #F0F0F0;
     height: 100vh;
